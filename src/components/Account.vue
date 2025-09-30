@@ -162,14 +162,8 @@ import { useroutesDataStore } from '@/stores/routesData';
                 this.selectedType = type.text
             },
             selectAccountAction(e){
-                
                 console.log(e)
                 this.selectedAccountAction = e
-                // if(e.nameId === 'getAll'){
-                //     this.accounts = mockAccounts;
-                //     this.callAcoounts()
-                // }
-                
             },
             callAcoounts(){
                 this.connector.getAccounts()

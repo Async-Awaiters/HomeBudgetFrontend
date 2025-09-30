@@ -20,11 +20,12 @@
                             :key="field"
                             :fieldName="field"
                         />
+                        <div class="check-policy">
+                            <input v-model="checkPolicy" type="checkbox">
+                            <p>Согласен с политикой конфиденциальности</p>
+                        </div> 
                     </div>
-                    <div class="check-policy">
-                        <input v-model="checkPolicy" type="checkbox">
-                        <p>Согласен с политикой конфиденциальности?</p>
-                    </div> 
+                    
                 </div>
                 <div v-if="!isRegistration">
                     <Field
@@ -42,7 +43,7 @@
                         :type="'request'"
                         :disabled="isDisabledButton"
                     />
-                    <CustomButton @click-on-button="closeModal" :text="'cancel'"/>
+                    <CustomButton @click-on-button="closeModal" :text="'отмена'"/>
                 </div>
             </div>
         </div>
@@ -84,11 +85,14 @@ import { useUIDataStore } from '@/stores/UIData';
                 return this.$root.connector;
             },
             returnTextOfMode(){
-                return this.isRegistration ? "registration" : "log in"
+                return this.isRegistration ? "регистрация" : "войти"
             },
             fieldTypes(){
                 const store = useformsDataStore()
                 return store.getAllData;
+            },
+            uiStore(){
+                return useUIDataStore();
             }
         },
         methods: {
@@ -143,16 +147,12 @@ import { useUIDataStore } from '@/stores/UIData';
                                     console.log('registered!!!!!!')
                                     // localStorage.setItem('login', JSON.stringify(store.login.value))
                                     this.closeModal()
+                                    this.uiStore.showNotification(false, 'Вы зарегистрировались', true)
 
-                                    UIData.$state.infoNotifications.status = true
-                                    UIData.$state.infoNotifications.text = 'Вы зарегистрировались'
-                                    UIData.$state.infoNotifications.isError = false
                                 })
                                 .catch(err => {
                                     console.log(err)
-                                    UIData.$state.infoNotifications.status = true
-                                    UIData.$state.infoNotifications.text = err.response.data.Error
-                                    UIData.$state.infoNotifications.isError = true
+                                    this.uiStore.showNotification(true, err.response.data.Error, true);
                                 })
                             }
                         }else {
@@ -175,12 +175,10 @@ import { useUIDataStore } from '@/stores/UIData';
                         //     text: "Пароли не совпадают!"
                         // }
                         this.updateErrorInfo(true, "Пароли не совпадают!")
-                        console.log(this.formsData.errorsNotation)
+                        // console.log(this.formsData.errorsNotation)
                     }
                           
                 }else{
-                    
-                
                     const userData = {
                         login: store.login.value,
                         password: store.password.value,
@@ -195,16 +193,18 @@ import { useUIDataStore } from '@/stores/UIData';
                             UIData.$state.isShowLoginButton = false
                             this.closeModal()
                             UIData.updateLogin()
-                            UIData.$state.infoNotifications.status = true
-                            UIData.$state.infoNotifications.text = 'Вы залогинены'
-                            UIData.$state.infoNotifications.isError = false
+                            // UIData.$state.infoNotifications.status = true
+                            // UIData.$state.infoNotifications.text = 'Вы залогинены'
+                            // UIData.$state.infoNotifications.isError = false
+                            this.uiStore.showNotification(false, 'Вы залогинены', true)
                                 
                         })
                         .catch(err => {
                             console.log(err)
-                            UIData.$state.infoNotifications.status = true
-                            UIData.$state.infoNotifications.text = 'Произошла ошибка'
-                            UIData.$state.infoNotifications.isError = true
+                            // UIData.$state.infoNotifications.status = true
+                            // UIData.$state.infoNotifications.text = 'Произошла ошибка'
+                            // UIData.$state.infoNotifications.isError = true
+                            this.uiStore.showNotification(true, err.response.data.Error, true)
                         })
                 }
             },
@@ -236,6 +236,7 @@ import { useUIDataStore } from '@/stores/UIData';
         },
         mounted(){
             console.log('11111', this.fieldTypes)
+            console.log('uistore', this.uiStore)
             // const currentDate = moment().format("DD.MM.YYYY");
             // console.log(currentDate)
             // console.log('diff', currentDate.diff(this.birthdate, "years"))

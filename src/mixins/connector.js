@@ -142,8 +142,8 @@ export default {
                 deleteCategory(id){
                     return dictionaryProxyConnector(`categories/${id}`, 'DELETE')
                 },
-                updateCategory(id){
-                    return dictionaryProxyConnector(`categories/${id}`, 'PUT')
+                updateCategory(data, id){
+                    return dictionaryProxyConnector(`categories/${id}`, 'PUT', data)
                 },
                 getCurrencies(){
                     return dictionaryProxyConnector('currencies','GET')

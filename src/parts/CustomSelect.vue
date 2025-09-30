@@ -62,6 +62,7 @@ import { useformsDataStore } from '@/stores/formsData'
             placeholder: String,
             fieldName: String,
             rules: { type: Array, default: () => [] },
+            selectHasSearch: Boolean
             // showErrors: { type: Boolean, default: true }
             
         },
@@ -71,6 +72,7 @@ import { useformsDataStore } from '@/stores/formsData'
                 // selectedItem: null,
                 isOpen: false,
                 // selectValue: ''
+                newItems: []
             }
         },
 
@@ -85,7 +87,7 @@ import { useformsDataStore } from '@/stores/formsData'
                 return this.store.$state.fields[this.fieldName].value;
             },
             searchingItems(){
-                if(this.selectedValue){
+                if(this.selectedValue && this.selectHasSearch){
                     let result = this.items.filter(item => {
                         return item.code.toLowerCase().includes(this.selectedValue.toLowerCase())
                     })
@@ -156,6 +158,15 @@ import { useformsDataStore } from '@/stores/formsData'
                         console.log('Refs доступны:', this.$refs.customSelectList);
                         
                     });
+                }
+            },
+            items: {
+                handler(newVal){
+                    console.log('newVal', newVal)
+                    // if(!this.items){
+                    //     console.log('newVal items', newVal)
+                        
+                    // }
                 }
             }
         },

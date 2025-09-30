@@ -14,6 +14,7 @@
             :fieldName="fieldName"
             :showButton="fields[fieldName].showButton"
             @add-select="addSelect"
+            :selectHasSearch="fields[fieldName].selectHasSearch"
             >
         </component>
         <!-- <p>{{ fields[fieldName].id }}</p> -->
@@ -25,7 +26,6 @@ import Text from '@/Fields/Text.vue';
 import Birthdate from '@/Fields/Birthdate.vue';
 import CustomSelect from '@/parts/CustomSelect.vue';
 import { useformsDataStore } from '@/stores/formsData';
-import connector from '@/mixins/connector';
 
 export default {
     components: {

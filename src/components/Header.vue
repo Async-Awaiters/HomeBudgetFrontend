@@ -133,6 +133,7 @@ import moment from "moment";
                     })
                     .catch(err => {
                         console.log('refresh err', err)
+                        console.log('ashdja111111111')
                         localStorage.removeItem('login')
                         localStorage.removeItem('token')
                     })
@@ -144,10 +145,15 @@ import moment from "moment";
             
         },
         mounted(){
-            if(this.isHasToken){
-                setInterval(() => {
-                    this.refresh();
-                }, this.convertTimeToRefreshToken);
+            if(!this.checkLogin){
+                this.refresh()
+                // this.
+            }else {
+                if(this.isHasToken){
+                    setInterval(() => {
+                        this.refresh();
+                    }, this.convertTimeToRefreshToken);
+                }
             }
         }
     }

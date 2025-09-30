@@ -13,6 +13,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'email обязателен'},
           {type: 'email', message: 'email не валидный'}
         ],
+        valueId: null,
         value: ""
       },
       password: {
@@ -26,6 +27,7 @@ export const useformsDataStore = defineStore('formsData', {
         rules: [
           {type: 'required', message: 'пароль обязателен'},
         ],
+        valueId: null,
         value: "",
       },
       confirmPassword: {
@@ -40,6 +42,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'пароль обязателен'},
 
         ],
+        valueId: null,
         value: "",
       },
       login: {
@@ -54,6 +57,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'логин обязателен'},
 
         ],
+        valueId: null,
         value: "",
       },
       firstName: {
@@ -68,6 +72,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'имя обязательно'},
 
         ],
+        valueId: null,
         value: "",
       },
       lastName: {
@@ -82,6 +87,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'фамилия обязательна'},
 
         ],
+        valueId: null,
         value: "",
       },
       birthdate: {
@@ -96,6 +102,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'дата рождения обязательна'},
 
         ],
+        valueId: null,
         value: "",
       },
       accountName: {
@@ -110,6 +117,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'имя счёта обязательно'},
 
         ],
+        valueId: null,
         value: "",
       },
       accountType: {
@@ -125,6 +133,8 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'поле обязательно'},
 
         ],
+        selectHasSearch: true,
+        valueId: null,
         value: "",
       },
       newAccountName: {
@@ -139,6 +149,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'имя счёта обязательно'},
 
         ],
+        valueId: null,
         value: "",
       },
       newAccountType: {
@@ -153,6 +164,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'тип счёта обязателен'},
 
         ],
+        valueId: null,
         value: "",
       },
       transactionAmount: {
@@ -167,6 +179,7 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'сумма обязательна'},
 
         ],
+        valueId: null,
         value: "",
       },
       transactionCategory: {
@@ -182,7 +195,9 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'поле обязательно'},
 
         ],
+        selectHasSearch: true,
         value: "",
+        valueId: null,
         showButton: true
       },
       transactionCurrency: {
@@ -198,14 +213,80 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'поле обязательно'},
 
         ],
+        selectHasSearch: true,
+        valueId: null,
         value: "",
       },
-    }
+      categoriesCreateField: {
+        id: "categoriesCreateField",
+        type: "text",
+        fieldType: 'Text',
+        label: "добавить категорию",
+        placeholder: "категория",
+        mask: "",
+        items: [],//массив для выбора из списка
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле обязательно'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      categoriesEditFieldValue: {
+        id: "categoriesEditFieldValue",
+        type: "text",
+        fieldType: 'Text',
+        label: "введите текст для изменения",
+        placeholder: "категория",
+        mask: "",
+        items: [],//массив для выбора из списка
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле обязательно'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      categoriesEditFieldSelect: {
+        id: "categoriesEditFieldSelect",
+        type: "text",
+        fieldType: 'CustomSelect',
+        label: "выберите категорию для изменения",
+        placeholder: "категория",
+        mask: "",
+        items: [],//массив для выбора из списка
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле обязательно'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      categoriesDeleteField: {
+        id: "categoriesDeleteField",
+        type: "text",
+        fieldType: 'CustomSelect',
+        label: "удалить категорию",
+        placeholder: "категория",
+        mask: "",
+        items: [],//массив для выбора из списка
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле обязательно'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+    },
     
-    // errorsNotation: {
-    //     status: false,
-    //     text: ""
-    // }
+    errorsNotation: {
+        status: false,
+        text: ""
+    }
   }),
   actions: {
     // Инициализация поля (вызывается в mounted компонента)
@@ -260,10 +341,14 @@ export const useformsDataStore = defineStore('formsData', {
       }
     },
     select(value, fieldName){
-      console.log(4, fieldName, value)
       // this.value = value
+      console.log('select value', value)
       console.log('select', this.fields[fieldName])
+      if(value.id){
+        this.fields[fieldName].valueId = value.id
+      }
       this.fields[fieldName].value = value.name;
+
     },
     selectClear(fieldName){
       this.fields[fieldName].value = ''

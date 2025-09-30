@@ -19,6 +19,11 @@ export const useUIDataStore = defineStore('UIData', {
         updateLogin(){
             console.log(this.isLogin)
             this.isLogin = localStorage.getItem('login') ? true : false
+        },
+        showNotification(type, message, status){
+            this.infoNotifications.isError = type;
+            this.infoNotifications.text = message;
+            this.infoNotifications.status = status;
         }
     }
 })

@@ -2,6 +2,7 @@
     <div class="main-page">
         <GreetingsPage v-if="!isLogin"/>
         <Account v-if="isLogin" @open-page="openPage"/>
+        <Categories v-if="isLogin"/>
         <Transition>
             <Information v-if="isShowInfo"/>
         </Transition>
@@ -14,12 +15,14 @@ import Account from '@/components/Account.vue';
 import Information from '@/components/Information.vue';
 import GreetingsPage from './GreetingsPage.vue';
 import { useUIDataStore } from '@/stores/UIData';
+import Categories from '@/parts/Categories.vue';
 
     export default {
         components: {
             Account,
             Information,
-            GreetingsPage
+            GreetingsPage,
+            Categories
         },
         data(){
             return {
@@ -46,7 +49,6 @@ import { useUIDataStore } from '@/stores/UIData';
                 }
             },
             isShowInfo(newVal, oldVal){
-                console.log('isShowInfo', oldVal, newVal)
                 if(newVal === true){
                     console.log('watch не равно')
                     this.timeout = setTimeout(()=> {
@@ -62,8 +64,6 @@ import { useUIDataStore } from '@/stores/UIData';
         },
         methods: {
             async openPage(e){
-                console.log('e', e)
-                console.log(this.$route)
                 const state = JSON.parse(JSON.stringify(e))
                 await this.$router.push({
                     name: 'account',
@@ -71,8 +71,6 @@ import { useUIDataStore } from '@/stores/UIData';
                     
                     
                 })
-                
-                console.log(this.$route)
                 // this.$router.push('/account/123').catch(err => {
                 //     console.error(err)
                 // })
@@ -102,6 +100,9 @@ import { useUIDataStore } from '@/stores/UIData';
     position: relative;
     padding: 40px;
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 
     @media (max-width: 400px) {
         padding: 20px;
