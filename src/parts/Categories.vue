@@ -1,5 +1,5 @@
 <template>
-    <div class="categories">
+    <div :class="{isHidden: isHidden}" class="categories">
         <h2 class="categories_title">Категории</h2>
         <p class="categories_subtitle">здесь вы можете добавить, изменить или удалить категории...</p>
         <div class="categories_inner">
@@ -21,6 +21,12 @@
                 </button>
             </div>
         </div>
+        <button 
+            @click="hideCategories" 
+            :class="{isHidden: isHidden}" 
+            class="categories_hide-button"
+            >hide
+        </button>
     </div>
 </template>
 
@@ -60,7 +66,8 @@ import { useformsDataStore } from '@/stores/formsData';
                 selectedCategoriesAction: null,
                 loading: false,
                 categoriesIsChanged: false,
-                fieldsNotEmpty: false
+                fieldsNotEmpty: false,
+                isHidden: true
             }
         },
         computed:{
@@ -97,7 +104,6 @@ import { useformsDataStore } from '@/stores/formsData';
         },
         methods: {
             selectCategoriesAction(e){
-                console.log('selectCategoriesAction', e)
                 this.selectedCategoriesAction = e;
             },
             categoriesAction(){
@@ -109,36 +115,36 @@ import { useformsDataStore } from '@/stores/formsData';
                             };
                             this.connector.addCategories(data)
                                 .then(res => {
-                                    console.log('addCategories res', res)
                                     this.uiStore.showNotification(false, 'Вы успешно добавили категорию', true);// не работает!
                                 })
                                 .catch(err => {
-                                    console.log('addCategories err', err)
                                     this.uiStore.showNotification(true, 'Не получилось добавить категорию!', true);
                                 })
                         }
                         
                     }else if(this.selectedCategoriesAction.nameId === "edit"){
-                        if(this.formsStore.fields.categoriesEditFieldValue.value && this.formsStore.fields.categoriesEditFieldValue.valueId){
-                            const data = {
-                                name: this.formsStore.fields.categoriesEditFieldValue.value
-                            }
-                            const id = this.formsStore.fields.categoriesEditFieldSelect.valueId;
-
-                            this.connector.updateCategory(data, id)
-                                .then(res => {
-                                    console.log('updateCategory res', res)
-                                    this.getCategories();
-                                    this.formsStore.fields['categoriesEditFieldSelect'].value = ''
-                                    this.formsStore.fields['categoriesEditFieldSelect'].valueId = null
-                                    this.formsStore.fields['categoriesEditFieldValue'].value = ''
-                                    this.uiStore.showNotification(false, 'Вы успешно изменили категорию', true);
-                                })
-                                .catch(err => {
-                                    console.log('updateCategory err', err)
-                                    this.uiStore.showNotification(true, 'Не получилось изменить категорию', true);
-                                })    
+                        const data = {
+                            name: this.formsStore.fields.categoriesEditFieldValue.value
                         }
+                        const id = this.formsStore.fields.categoriesEditFieldSelect.valueId;
+
+                        this.connector.updateCategory(data, id)
+                            .then(res => {
+                                this.loading = true
+                                this.getCategories();
+                                this.formsStore.fields['categoriesEditFieldSelect'].value = ''
+                                this.formsStore.fields['categoriesEditFieldSelect'].valueId = null
+                                this.formsStore.fields['categoriesEditFieldValue'].value = ''
+                                this.uiStore.showNotification(false, 'Вы успешно изменили категорию', true);
+                            })
+                            .catch(err => {
+                                console.log('updateCategory err', err)
+                                this.uiStore.showNotification(true, 'Не получилось изменить категорию', true);
+                            }) 
+                            .finally(() => {
+                                this.loading = false;
+                            })   
+                        
                         
                     }else if(this.selectedCategoriesAction.nameId === "delete"){
                         if(this.formsStore.fields.categoriesDeleteField.value){
@@ -150,7 +156,6 @@ import { useformsDataStore } from '@/stores/formsData';
                                     this.uiStore.showNotification(false, 'Вы успешно удалили категорию', true);
                                 })
                                 .catch(err => {
-                                    console.log(err)
                                     this.uiStore.showNotification(true, 'Не получилось удалить категорию', true);
                                 }) 
                         }
@@ -171,6 +176,9 @@ import { useformsDataStore } from '@/stores/formsData';
                     .finally(()=> {
                         this.loading = false;
                     })
+            },
+            hideCategories(){
+                this.isHidden = !this.isHidden
             }
         },
         created(){
@@ -187,12 +195,34 @@ import { useformsDataStore } from '@/stores/formsData';
     width: 100%;
     border-radius: 8px;
     padding: 20px;
+    position: relative;
+
+    &_subtitle {
+        margin-bottom: 20px;
+    }
 
     &_btn {
         background-color: #71ceed;
         height: 42px;
         padding: 0 20px;
         border-radius: 8px;
+    }
+
+    &_hide-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+
+        &.isHidden {
+            top: 10px;
+        }
+
+    }
+
+    &.isHidden {
+        height: 40px;
+        padding: 0;
+        overflow: hidden;
     }
 }
 </style>

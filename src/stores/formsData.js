@@ -1,4 +1,5 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
+import {accountTypes} from './../helpers/accountTypes';
 
 export const useformsDataStore = defineStore('formsData', {
   state: () => ({
@@ -127,7 +128,8 @@ export const useformsDataStore = defineStore('formsData', {
         label: "тип счёта",
         placeholder: "тип счёта",
         mask: "",
-        items: [],
+        onlySelect: true,
+        items: accountTypes,
         errors: [],
         rules: [
           {type: 'required', message: 'поле обязательно'},
@@ -135,6 +137,7 @@ export const useformsDataStore = defineStore('formsData', {
         ],
         selectHasSearch: true,
         valueId: null,
+        valueEn: '',
         value: "",
       },
       newAccountName: {
@@ -281,6 +284,70 @@ export const useformsDataStore = defineStore('formsData', {
         valueId: null,
         value: "",
       },
+      accountCurrency: {
+        id: "accountCurrency",
+        type: "text",
+        fieldType: 'CustomSelect',
+        label: "валюта",
+        placeholder: "выберите валюту",
+        mask: "",
+        items: [],//массив для выбора из списка
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле обязательно'},
+
+        ],
+        selectHasSearch: true,
+        valueId: null,
+        value: "",
+      },
+      transactionDescription: {
+        id: "transactionDescription",
+        type: "text",
+        fieldType: 'Text',
+        label: "введите описание",
+        placeholder: "описание",
+        mask: "",
+        items: [],//массив для выбора из списка
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле обязательно'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      accountOverdraft: {
+        id: "accountOverdraft",
+        type: "number",
+        fieldType: 'Text',
+        label: "овердрафт",
+        placeholder: "введите сумму",
+        mask: "",
+        errors: [],
+        rules: [
+          {type: 'required', message: 'сумма обязательна'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      accountCreditLimit: {
+        id: "accountCreditLimit",
+        type: "number",
+        fieldType: 'Text',
+        label: "кредитный лимит",
+        placeholder: "введите сумму",
+        mask: "",
+        errors: [],
+        rules: [
+          {type: 'required', message: 'сумма обязательна'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      
     },
     
     errorsNotation: {
@@ -341,12 +408,18 @@ export const useformsDataStore = defineStore('formsData', {
       }
     },
     select(value, fieldName){
+      console.log('onlySelect', this.fields[fieldName], this.fields[fieldName].onlySelect)
       // this.value = value
       console.log('select value', value)
       console.log('select', this.fields[fieldName])
       if(value.id){
-        this.fields[fieldName].valueId = value.id
+        this.fields[fieldName].valueId = value.id;
+
+        if(this.fields[fieldName].id === 'accountType'){
+          this.fields[fieldName].valueEn = value.nameEn;
+        }
       }
+      
       this.fields[fieldName].value = value.name;
 
     },

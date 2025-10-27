@@ -5,7 +5,7 @@ import { useUIDataStore } from '@/stores/UIData';
 // console.log('store connector', store);
 // const baseUrl = "http://localhost:5000/api/";
 
-
+console.log('links', process.env.VUE_APP_AUTH_URL)
 
 function proxyConnector(url, method, data) {
     let config = {
@@ -14,7 +14,7 @@ function proxyConnector(url, method, data) {
             'Content-Type':'application/json',
             'Authorization': JSON.parse(localStorage.getItem('token'))
         },
-        url: "http://localhost:5002/api/" + url,
+        url: process.env.VUE_APP_ACC_URL  + url,
         data : data ? data : null
     };
 
@@ -37,7 +37,7 @@ function authProxyConnector(url, method, data) {
             'Content-Type':'application/json',
             'Authorization': JSON.parse(localStorage.getItem('token'))
         },
-        url: "http://localhost:5000/api/" + url,
+        url: process.env.VUE_APP_AUTH_URL + url,
         data : data ? data : null
     };
 
@@ -60,7 +60,7 @@ function dictionaryProxyConnector(url, method, data) {
             'Content-Type':'application/json',
             'Authorization': JSON.parse(localStorage.getItem('token'))
         },
-        url: "http://localhost:5001/api/" + url,
+        url: process.env.VUE_APP_DIC_URL + url,
         data : data ? data : null
     };
 
@@ -101,7 +101,7 @@ export default {
                     return proxyConnector("accounts/", "POST", data)
                 },
                 getAccounts(data){
-                    return proxyConnector("accounts/", "GET", data)
+                    return proxyConnector("accounts", "GET", data)
                 },
                 getAccount(id){
                     return proxyConnector(`accounts/${id}`, "GET")
@@ -118,6 +118,9 @@ export default {
                 },
                 addTransaction(data){
                     return proxyConnector("transactions/", "POST", data)
+                },
+                getTransactions(accountId){
+                    return proxyConnector(`transactions/${accountId}`, "GET")
                 },
                 deleteTransaction(id){
                     return proxyConnector(`transactions/${id}`, "DELETE")

@@ -1,6 +1,6 @@
 <template>
     <div class="add-transaction">
-        <h2>Транзакции</h2>
+        <!-- <h2>Транзакции</h2> -->
         <div class="add-transaction_inner">
             <Field
                 v-for="field in fields"
@@ -23,8 +23,12 @@ import Field from '@/components/Field.vue';
 import CustomSelect from '@/parts/CustomSelect.vue';
 import { useformsDataStore } from '@/stores/formsData';
 import RequestButton from './RequestButton.vue';
+import moment from 'moment';
 
     export default {
+        props: {
+            id: String
+        },
         components: {
             CustomSelect,
             Field,
@@ -32,7 +36,7 @@ import RequestButton from './RequestButton.vue';
         },
         data(){
             return {
-                fields: ['transactionAmount', 'transactionCurrency', 'transactionCategory'],
+                fields: ['transactionAmount', 'transactionCurrency', 'transactionCategory', 'transactionDescription'],
                 loading: false,
                 // currencies: [],
                 // categories: [],
@@ -82,16 +86,35 @@ import RequestButton from './RequestButton.vue';
                     })
                 this.store.transactionCategory.items = this.categories
             },
+            // getTransactions(){
+            //     const id = this.id;
+            //     this.connector.getTransactions(id)
+            //         .then(res => {
+                        
+            //         })
+            // },
             addTransaction(){
+                const date = moment().toISOString();
+                console.log('date', date)
                 const data = {
-                    amount: this.store.transactionAmount.value,
+                    // id: "116a8257-7552-409b-a188-80d131665fd6",//убрать позже
+                    accountId: this.id,
+                    amount: Number(this.store.transactionAmount.value),
                     currency: this.store.transactionCurrency.value,
-                    category: this.store.transactionCategory.value,
+                    // category: this.store.transactionCategory.value,
+                    category: "Cash",
+                    description: this.store.transactionDescription.value, // required
+                    // date,
+                    // planDate: true,
+                    // isApproved: true,
+                    // isRepeated: false,
+                    // isDeleted: true
                 }
                 this.loading = true;
                 this.connector.addTransaction(data)
                     .then(res => {
                         console.log('addTransaction res', res)
+                        this.$emit('handle-request')
                     })
                     .catch(err => {
                         console.log('addTransaction err', err)

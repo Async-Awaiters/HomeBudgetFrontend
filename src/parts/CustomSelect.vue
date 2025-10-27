@@ -2,7 +2,8 @@
     <div class="custom-select" ref="autocompleteContainer">
         <label for="id">{{ label }}</label>
         <div class="custom-select_input">
-            <input 
+            <input
+                v-if="!onlySelect" 
                 @click="openSelect" 
                 @blur="handleBlur"
                 v-model="localValue"
@@ -10,8 +11,14 @@
                 :placeholder="placeholder"
                 class="custom-select_choosen"
             />
+            <p 
+                v-if="onlySelect"
+                @click="openSelectOnly" 
+                class="only-select"
+                >{{ localValue }}
+            </p>
             <button 
-                v-if="isOpen"
+                v-if="isOpen && !onlySelect"
                 @click="$emit('clear-field')"
                 :class="{'position-left': showButton}" 
                 class="custom-select_close"
@@ -62,7 +69,8 @@ import { useformsDataStore } from '@/stores/formsData'
             placeholder: String,
             fieldName: String,
             rules: { type: Array, default: () => [] },
-            selectHasSearch: Boolean
+            selectHasSearch: Boolean,
+            onlySelect: Boolean
             // showErrors: { type: Boolean, default: true }
             
         },
@@ -72,7 +80,8 @@ import { useformsDataStore } from '@/stores/formsData'
                 // selectedItem: null,
                 isOpen: false,
                 // selectValue: ''
-                newItems: []
+                newItems: [],
+                onlySelectValue: ''
             }
         },
 
@@ -87,7 +96,7 @@ import { useformsDataStore } from '@/stores/formsData'
                 return this.store.$state.fields[this.fieldName].value;
             },
             searchingItems(){
-                if(this.selectedValue && this.selectHasSearch){
+                if(this.selectedValue && this.selectHasSearch && !this.onlySelect){
                     let result = this.items.filter(item => {
                         return item.code.toLowerCase().includes(this.selectedValue.toLowerCase())
                     })
@@ -148,6 +157,9 @@ import { useformsDataStore } from '@/stores/formsData'
             addToSelect(e){
                 console.log('e.target.value', this.localValue)
                 this.$emit('add-select', this.localValue)
+            },
+            openSelectOnly(){
+                this.isOpen = !this.isOpen
             }
 
         },
@@ -290,5 +302,15 @@ import { useformsDataStore } from '@/stores/formsData'
     position: relative;
 }
 
+.custom-select .only-select {
+    // background-color: red;
+    width: 100%;
+    display: block;
+    height: 42px;
+    border: 1px solid #B5B8B1;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
 
+}
 </style>

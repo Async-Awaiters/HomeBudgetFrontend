@@ -1,8 +1,5 @@
 <template>
     <div class="account">
-        <!-- <ReportTable
-            :reportData="reportData"
-        /> -->
         <h2>Счета</h2>
         <SwitchPanel
             @select-item="selectAccountAction"
@@ -44,8 +41,8 @@
                     @click="openPage(account)"
                     class="account_list-item"
                     >
-                    <p class="account_name">{{ account.Name}}</p>
-                    <p class="account_sum">{{ account.Amount }}</p>
+                    <p class="account_name">{{ account.name}}</p>
+                    <p class="account_sum">баланс: {{ account.balance }}</p>
                 </li>
             </ul>
             <button @click="openDropdown" class="account_list_button"></button>
@@ -56,8 +53,7 @@
 
 <script>
 import ReportTable from './ReportTable.vue';
-// import fakeAccountData from '../helpers/mockAccountsData';
-import { mockAccount, mockAccounts } from '@/helpers/mockAccountsData';
+// import { mockAccount, mockAccounts } from '@/helpers/mockAccountsData';
 import Field from './Field.vue';
 import SwitchPanel from '@/parts/SwitchPanel.vue';
 import CustomSelect from '@/parts/CustomSelect.vue';
@@ -75,16 +71,16 @@ import { useroutesDataStore } from '@/stores/routesData';
         },
         data(){
             return {
-                fields: ['accountName', 'accountType'],
+                fields: ['accountName', 'accountType', 'accountCurrency', 'accountOverdraft', 'accountCreditLimit'],
                 loading: false,
                 countOfShowAccounts: 3,
                 dropDownOpen: false,
-                accounts: null,
+                accounts: [],
                 state: {
                     accountPageData: null,
                     totalSum: null
                 },
-                balance: '100 000',
+                balance: '',
                 selectedAccountAction: null,
                 accountSwitchPanel: [
                     {
@@ -100,20 +96,21 @@ import { useroutesDataStore } from '@/stores/routesData';
                         initialSelect: true
                     }
                 ],
-                typesOfAccount: [
-                    {
-                        id: 1,
-                        text: 'дебет'
-                    },
-                    {
-                        id: 2,
-                        text: 'кредит'
-                    },
-                    {
-                        id: 3,
-                        text: 'другое'
-                    },
-                ],
+                currencies: [],
+                // typesOfAccount: [
+                //     {
+                //         id: 1,
+                //         text: 'дебет'
+                //     },
+                //     {
+                //         id: 2,
+                //         text: 'кредит'
+                //     },
+                //     {
+                //         id: 3,
+                //         text: 'другое'
+                //     },
+                // ],
                 selectedType: '',
                 
             }
@@ -124,8 +121,8 @@ import { useroutesDataStore } from '@/stores/routesData';
             },
 
             accountsToShow(){
-                if(!this.dropDownOpen){
-                    return this.accounts.slice(0, this.countOfShowAccounts)
+                if(!this.dropDownOpen && this.accounts){
+                    return this.accounts.length > this.countOfShowAccounts ? this.accounts.slice(0, this.countOfShowAccounts) : this.accounts
                 }else {
                     return this.accounts
                 }
@@ -150,7 +147,7 @@ import { useroutesDataStore } from '@/stores/routesData';
                 console.log('eeeee', e)
                 this.$router.push({
                     name: 'account',
-                    params: {id: e.Id},
+                    params: {id: e.id},
                                        
                 })
                 // this.state.accountPageData = e
@@ -165,12 +162,24 @@ import { useroutesDataStore } from '@/stores/routesData';
                 console.log(e)
                 this.selectedAccountAction = e
             },
-            callAcoounts(){
+            callAccounts(){
                 this.connector.getAccounts()
                         .then(res =>{
                             console.log('getAllAccounts res', res)
-                            this.accounts = res
+                            this.accounts = res.data;
+                            this.getCurrencies();
                         })
+                        // .then(response => {
+                        //     this.connector.getCurrencies()
+                        // })
+                        // .then(response){
+                        //     this.connector.getCurrencies
+                            // .then(res => {
+                            //     console.log('res 22123', res)
+                            //     this.currencies = res.data;
+                            // })
+                            // // .catch(err => console.log('getCurrencies err', err))
+                            //     // }
                         .catch(err => {
                             console.log('getAllAccounts err', err)
                         })
@@ -181,8 +190,9 @@ import { useroutesDataStore } from '@/stores/routesData';
                 if(this.selectedAccountAction.nameId === 'create'){
                     const requestData = {
                         name: this.store.accountName.value,
-                        type: this.store.accountType.value,
-                        is_active: true
+                        type: this.store.accountType.valueEn,
+                        is_active: true,
+                        userId: JSON.parse(localStorage.getItem('userId'))
                     }
                     this.loading = true;
                     this.connector.createAccount(requestData)
@@ -197,17 +207,27 @@ import { useroutesDataStore } from '@/stores/routesData';
                         })
                 }
             },
+            getCurrencies(){
+                this.connector.getCurrencies()
+                    .then(res => {
+                        console.log('res 22123', res)
+                        // this.currencies = res.data;
+                        this.store.accountCurrency.items = res.data;
+                    })
+                    .catch(err => console.log('getCurrencies err', err))
+            },
             clearSelectField(){
                 this.selectedType = ''
 
             },
-            addAccountTypes(){
-                this.store.accountType.items = this.typesOfAccount;
-            },
+            // addAccountTypes(){
+            //     this.store.accountType.items = this.typesOfAccount;
+            // },
             getBalance(){
                 this.connector.getBalance()
                     .then(res => {
                         console.log("getBalance res", res)
+                        this.balance = res.data.totalBalance;
                     })
                     .catch(err => {
                         console.log('getBalance err', err)
@@ -216,13 +236,13 @@ import { useroutesDataStore } from '@/stores/routesData';
         },
 
         mounted(){
-            this.addAccountTypes();
-            this.accounts = mockAccounts;
-            // this.getBalance(); //пока не работает не удалять!
-            // this.callAcoounts()
-            this.state.totalSum = this.getTotalSum;
+            // this.addAccountTypes();
+            // this.accounts = mockAccounts;
+            this.callAccounts()
+            this.getBalance(); //пока не работает не удалять!
+            // this.state.totalSum = this.getTotalSum;
             // sessionStorage.setItem('state', JSON.stringify(this.state))
-            console.log('sum total', this.getTotalSum)
+            // console.log('sum total', this.getTotalSum)
         }
         
     }

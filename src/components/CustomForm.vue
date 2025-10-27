@@ -3,28 +3,32 @@
             <div class="signIn_inner">
                 <div class="titles">
                     <h3 
-                        @click="isRegistration = true"
-                        :class="isRegistration ? 'active' : ''"
-                        >регистрация
-                    </h3>
-                    <h3 
                         @click="isRegistration = false"
                         :class="isRegistration ? '' : 'active'"
                         >войти
                     </h3>
+                    <h3 
+                        @click="isRegistration = true"
+                        :class="isRegistration ? 'active' : ''"
+                        >регистрация
+                    </h3>
                 </div>
-                <div v-if="isRegistration">
+                <div v-if="isRegistration" class="forms_container">
                     <div class="registration_container">
                         <Field
                             v-for="field of fields"
                             :key="field"
                             :fieldName="field"
                         />
-                        <div class="check-policy">
+                        <!-- <div class="check-policy">
+                            <input v-model="checkPolicy" type="checkbox">
+                            <p>Согласен с политикой конфиденциальности</p>
+                        </div>  -->
+                    </div>
+                    <div class="check-policy">
                             <input v-model="checkPolicy" type="checkbox">
                             <p>Согласен с политикой конфиденциальности</p>
                         </div> 
-                    </div>
                     
                 </div>
                 <div v-if="!isRegistration">
@@ -70,7 +74,7 @@ import { useUIDataStore } from '@/stores/UIData';
         },
         data(){
             return {
-                isRegistration: true,
+                isRegistration: false,
                 fields: ['email', 'password', 'confirmPassword', 'login', 'firstName', 'lastName', 'birthdate'],
                 authFields: ['login', 'password'],
                 checkPolicy: false,
@@ -190,6 +194,7 @@ import { useUIDataStore } from '@/stores/UIData';
                             localStorage.setItem('login', JSON.stringify(store.login.value))
                             localStorage.setItem('token', JSON.stringify(response.headers?.authorization))
                             localStorage.setItem('loginDate', JSON.stringify(moment().format('DD.MM.YYYY HH:mm:ss')))
+                            localStorage.setItem('userId', JSON.stringify(response.data.user.id))
                             UIData.$state.isShowLoginButton = false
                             this.closeModal()
                             UIData.updateLogin()
@@ -204,7 +209,7 @@ import { useUIDataStore } from '@/stores/UIData';
                             // UIData.$state.infoNotifications.status = true
                             // UIData.$state.infoNotifications.text = 'Произошла ошибка'
                             // UIData.$state.infoNotifications.isError = true
-                            this.uiStore.showNotification(true, err.response.data.Error, true)
+                            this.uiStore.showNotification(true, err, true)
                         })
                 }
             },
@@ -315,13 +320,18 @@ import { useUIDataStore } from '@/stores/UIData';
         gap: 10px;
         flex-wrap: wrap;
         justify-content: center;
+        // margin: 0 auto;
 
-       &_field {
-        width: 45%;
+       & .field_container {
+        width: 49%;
         @media(max-width: 600px){
             width: 100%;
         }
        }
     }
+}
+
+.forms_container {
+    
 }
 </style>

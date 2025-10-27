@@ -15,6 +15,7 @@
             :showButton="fields[fieldName].showButton"
             @add-select="addSelect"
             :selectHasSearch="fields[fieldName].selectHasSearch"
+            :onlySelect="fields[fieldName].onlySelect"
             >
         </component>
         <!-- <p>{{ fields[fieldName].id }}</p> -->
@@ -77,7 +78,7 @@ export default {
     methods: {
         selectItem(value){
             console.log(3, value)
-            this.fieldsActions.select(value, this.fieldName)
+            this.fieldsActions.select(value, this.fieldName, this.onlySelect)
         },
         clearSelect(){
             this.fieldsActions.selectClear(this.fieldName)

@@ -5,6 +5,7 @@
 <script>
 import MainTemplate from '@/components/MainTemplate.vue';
 // import { useRouter } from 'vue-router'
+import moment from 'moment';
 
 export default {
   name: 'App',
@@ -15,6 +16,11 @@ export default {
     return {
       isTokenValid: true
     }
+  },
+  computed: {
+    dateNow(){
+      return moment().format('DD.MM.YYYY HH:mm:ss')
+    },
   },
   methods: {
     async checkToken(){
@@ -31,6 +37,8 @@ export default {
       this.$root.connector.refresh()
         .then(res => {
           this.isTokenValid = true
+          localStorage.setItem('lastRefreshToken', JSON.stringify(this.dateNow))
+          localStorage.setItem('token', JSON.stringify(res.headers.authorization))
           console.log('call 1')
         })
         .catch(err => {

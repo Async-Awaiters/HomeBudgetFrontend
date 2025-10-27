@@ -88,9 +88,9 @@ import moment from "moment";
             },
             checkLogin(){
                 if(this.loginDate){
-                    console.log('diff', moment(this.dateNow, 'YYYY-MM-DD HH:mm:ss').diff(moment(this.loginDate, 'YYYY-MM-DD HH:mm:ss'), 'minutes'))
-
-                    return moment(this.dateNow, 'YYYY-MM-DD HH:mm:ss').diff(moment(this.loginDate, 'YYYY-MM-DD HH:mm:ss'), 'minutes') <= this.timeToRefreshToken ? true : false;
+                    const diff = moment(this.dateNow, 'YYYY-MM-DD HH:mm:ss').diff(moment(this.loginDate, 'YYYY-MM-DD HH:mm:ss'), 'minutes');
+                    console.log('diff', diff)
+                    return diff > 0 && diff <= this.timeToRefreshToken ? true : false;
                 }else {
                     return null;
                 }
@@ -133,7 +133,6 @@ import moment from "moment";
                     })
                     .catch(err => {
                         console.log('refresh err', err)
-                        console.log('ashdja111111111')
                         localStorage.removeItem('login')
                         localStorage.removeItem('token')
                     })

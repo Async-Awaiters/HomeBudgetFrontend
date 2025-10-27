@@ -1,6 +1,6 @@
 <template>
     <div class="text_container">
-        <div class="text_container_outer">
+        <div  class="text_container_outer">
             <label for="id">{{ label }}</label>
             <div class="text_container_inner">
                 <input
@@ -87,13 +87,12 @@ export default {
     width: 100%;
     height: 42px;
     border-radius: 8px;
-    border: 2px solid silver;
+    border: 1px solid #B5B8B1;
     background-color: #fff;
     outline: none;
-    border: 1px solid #000;
     padding-left: 10px;
     font-size: 18px;
-    margin-bottom: 20px;
+    // margin-bottom: 20px;
     
     &_container {
         margin-bottom: 10px;
@@ -102,6 +101,7 @@ export default {
 
         &_outer {
           width: 100%;
+          // margin-bottom: 20px;
         }
         
         &_inner {
@@ -136,5 +136,9 @@ export default {
         left: 10px;
 
     }
+}
+
+.has-errors {
+  margin-bottom: 20px;
 }
 </style>
