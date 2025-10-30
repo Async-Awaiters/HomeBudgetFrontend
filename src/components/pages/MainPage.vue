@@ -99,7 +99,7 @@ import Categories from '@/parts/Categories.vue';
 .main-page {
     position: relative;
     padding: 40px;
-    height: 100vh;
+    min-height: 900px;
     display: flex;
     flex-direction: column;
     gap: 40px;

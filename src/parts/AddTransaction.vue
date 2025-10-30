@@ -22,12 +22,14 @@
 import Field from '@/components/Field.vue';
 import CustomSelect from '@/parts/CustomSelect.vue';
 import { useformsDataStore } from '@/stores/formsData';
+import { useUIDataStore } from '@/stores/UIData';
 import RequestButton from './RequestButton.vue';
 import moment from 'moment';
 
     export default {
         props: {
-            id: String
+            id: String,
+            action: String
         },
         components: {
             CustomSelect,
@@ -36,7 +38,7 @@ import moment from 'moment';
         },
         data(){
             return {
-                fields: ['transactionAmount', 'transactionCurrency', 'transactionCategory', 'transactionDescription'],
+                fields: ['transactionAmount',  'transactionCategory', 'transactionDescription'],
                 loading: false,
                 // currencies: [],
                 // categories: [],
@@ -50,21 +52,20 @@ import moment from 'moment';
             },
             store(){
                 return useformsDataStore().$state.fields;
+            },
+            uiStore(){
+                return useUIDataStore().$state;
             }
         },
         methods: {
             selectCurrency(currency){
-                console.log('выбрал', currency)
                 this.selectedCurrency = currency.text;
             },
             selectCategory(category){
-                console.log('выбрал', category)
                 this.selectedCategory = category.text;
             },
 
             getCurrencies(){
-                // console.log(1, this.store.transactionCurrency.items)
-                // this.store.transactionCurrency.items = this.currencies;
                 this.connector.getCurrencies()
                     .then(res => {
                         console.log('getCurrencies res', res)
@@ -86,21 +87,12 @@ import moment from 'moment';
                     })
                 this.store.transactionCategory.items = this.categories
             },
-            // getTransactions(){
-            //     const id = this.id;
-            //     this.connector.getTransactions(id)
-            //         .then(res => {
-                        
-            //         })
-            // },
             addTransaction(){
                 const date = moment().toISOString();
-                console.log('date', date)
                 const data = {
-                    // id: "116a8257-7552-409b-a188-80d131665fd6",//убрать позже
                     accountId: this.id,
                     amount: Number(this.store.transactionAmount.value),
-                    currency: this.store.transactionCurrency.value,
+                    // currency: this.store.transactionCurrency.value,
                     // category: this.store.transactionCategory.value,
                     category: "Cash",
                     description: this.store.transactionDescription.value, // required
@@ -113,8 +105,9 @@ import moment from 'moment';
                 this.loading = true;
                 this.connector.addTransaction(data)
                     .then(res => {
-                        console.log('addTransaction res', res)
                         this.$emit('handle-request')
+                        this.clearFields()
+                        this.uiStore.isNeedBalanceUpdate = true;
                     })
                     .catch(err => {
                         console.log('addTransaction err', err)
@@ -122,6 +115,11 @@ import moment from 'moment';
                     .finally(()=> {
                         this.loading = false;
                     })
+            },
+            clearFields(){
+                for(let field of this.fields){
+                    this.store[field].value = ''
+                }
             }
         },
         mounted(){

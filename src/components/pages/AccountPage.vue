@@ -34,15 +34,34 @@
         </div> 
         <div class="transactions">
             <h2 class="transactions_title">Транзакции</h2>
-            <button 
-                @click="switchAction"
-                id="add"
-                class="account-page_buttons_button transactions"
-                >Добавить транзакцию
-            </button>
+            <div>
+                <SwitchPanel
+                    @select-item="selectTransactionAction"
+                    :items="transactionsActions"
+                />
+                <!-- <button 
+                    @click="switchAction"
+                    id="add"
+                    class="account-page_buttons_button transactions"
+                    >Добавить транзакцию
+                </button>
+                <button 
+                    @click="switchAction"
+                    id="add"
+                    class="account-page_buttons_button transactions"
+                    >Изменить транзакцию
+                </button>
+                <button 
+                    @click="switchAction"
+                    id="add"
+                    class="account-page_buttons_button transactions"
+                    >Удалить транзакцию
+                </button> -->
+            </div>
             <AddTransaction 
-                v-if="currentAction === 'add'"
-                :id="currentAccount.id"
+                v-if="currentTransactionAction"
+                :id="currentAccount?.id"
+                :action="currentTransactionAction.nameId"
                 @handleRequest="handleRequest"
             />
             <ul v-if="transactionsCheck" class="transactions_list">
@@ -63,24 +82,46 @@
 </template>
 
 <script>
-import { mockAccount } from '@/helpers/mockAccountsData';
+// import { mockAccount } from '@/helpers/mockAccountsData';
 import { useformsDataStore } from '@/stores/formsData';
 import { useUIDataStore } from '@/stores/UIData';
 import Field from '@/components/Field.vue';
 import AddTransaction from '@/parts/AddTransaction.vue';
 import moment from 'moment';
-
+import SwitchPanel from '@/parts/SwitchPanel.vue';
 
     export default {
         components: {
             Field,
-            AddTransaction
+            AddTransaction,
+            SwitchPanel
         },
         data(){
             return {
                 currentAccount: null,
                 currentAction: '',
                 transactions: [],
+                transactionsActions: [
+                    {
+                        id:1,
+                        nameId:"add",
+                        name:"добавить",
+                        initialSelect:false
+                    },
+                    {
+                        id:2,
+                        nameId:"edit",
+                        name:"изменить",
+                        initialSelect:false
+                    },
+                    {
+                        id:3,
+                        nameId:"delete",
+                        name:"удалить",
+                        initialSelect:false
+                    },
+                ],
+                currentTransactionAction: null
             }
         },
         computed: {
@@ -119,10 +160,6 @@ import moment from 'moment';
                         console.log('getAccount err', err)
                     })
             },
-            // getMockData(id){
-            //     this.currentAccount = mockAccount.find(el => el.Id === id);
-            // },
-
             editAcoount(){
                 const store = useformsDataStore().$state.fields;
                 const data = {
@@ -175,14 +212,15 @@ import moment from 'moment';
             },
             handleRequest(){
                 this.getTransactionsByAccount();
-            }
+            },
+            selectTransactionAction(e){
+                console.log(e)
+                this.currentTransactionAction = e
+                // this.currentAction = e?.nameId
+            },
         },
         mounted(){
-            // console.log('asdas', this.$route.params)
-            // this.uiStore.updateLogin()
-            // console.log('params', this.$route.params)
             this.getCurrentAccount();
-            // this.getTransactionsByAccount();
         },
         created(){
             // this.getMockData(this.$route.params.id)

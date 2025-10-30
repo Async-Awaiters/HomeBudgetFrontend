@@ -12,7 +12,8 @@ export const useUIDataStore = defineStore('UIData', {
         modalData: {
             isActive: false,
             accountToDeleteId: null
-        }
+        },
+        isNeedBalanceUpdate: false
 
     }),
     actions: {

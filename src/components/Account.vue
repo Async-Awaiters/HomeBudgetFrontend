@@ -13,13 +13,6 @@
                     :key="field"
                     :fieldName="field"
                 />
-                <!-- <CustomSelect
-                    @select-item="selectType"
-                    @clear-field="clearSelectField"
-                    v-model="selectedType"
-                    :items="typesOfAccount"
-                /> -->
-                <!-- <button class="account_btn_create" @click="createAccount">Создать счёт</button> -->
                 <RequestButton
                     @click="createAccount"
                     :loading="loading" 
@@ -29,7 +22,7 @@
             </div>
         </div>
 
-        <div v-if="selectedAccountAction?.nameId === 'getAll'">
+        <div v-if="selectedAccountAction?.nameId === 'getAll' && accounts.length > 0">
             <ul 
                 ref="list" 
                 :class="dropDownOpen ? 'dropdown-open' : ''" 
@@ -47,6 +40,7 @@
             </ul>
             <button @click="openDropdown" class="account_list_button"></button>
         </div>
+        <p v-if="selectedAccountAction?.nameId === 'getAll' && accounts.length === 0" >Счета не найдены</p>
         
     </div>
 </template>
@@ -80,7 +74,7 @@ import { useroutesDataStore } from '@/stores/routesData';
                     accountPageData: null,
                     totalSum: null
                 },
-                balance: '',
+                balance: 0,
                 selectedAccountAction: null,
                 accountSwitchPanel: [
                     {
@@ -97,20 +91,6 @@ import { useroutesDataStore } from '@/stores/routesData';
                     }
                 ],
                 currencies: [],
-                // typesOfAccount: [
-                //     {
-                //         id: 1,
-                //         text: 'дебет'
-                //     },
-                //     {
-                //         id: 2,
-                //         text: 'кредит'
-                //     },
-                //     {
-                //         id: 3,
-                //         text: 'другое'
-                //     },
-                // ],
                 selectedType: '',
                 
             }
@@ -167,19 +147,8 @@ import { useroutesDataStore } from '@/stores/routesData';
                         .then(res =>{
                             console.log('getAllAccounts res', res)
                             this.accounts = res.data;
-                            this.getCurrencies();
+                            // this.getCurrencies();
                         })
-                        // .then(response => {
-                        //     this.connector.getCurrencies()
-                        // })
-                        // .then(response){
-                        //     this.connector.getCurrencies
-                            // .then(res => {
-                            //     console.log('res 22123', res)
-                            //     this.currencies = res.data;
-                            // })
-                            // // .catch(err => console.log('getCurrencies err', err))
-                            //     // }
                         .catch(err => {
                             console.log('getAllAccounts err', err)
                         })
@@ -240,6 +209,7 @@ import { useroutesDataStore } from '@/stores/routesData';
             // this.accounts = mockAccounts;
             this.callAccounts()
             this.getBalance(); //пока не работает не удалять!
+            this.getCurrencies();
             // this.state.totalSum = this.getTotalSum;
             // sessionStorage.setItem('state', JSON.stringify(this.state))
             // console.log('sum total', this.getTotalSum)
