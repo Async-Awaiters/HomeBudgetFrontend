@@ -32,7 +32,8 @@ import { useUIDataStore } from '@/stores/UIData';
                 this.state.isActive = false;
                 this.connector.deleteAccount(this.state.accountToDeleteId)
                     .then(res => {
-                        console.log('account delete res', res)
+                        // console.log('account delete res', res)
+                        this.$router.replace({name: 'home'})
                         //todo подумать про редирект
                     })
                     .catch(err => {

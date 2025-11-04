@@ -20,7 +20,7 @@ export const useformsDataStore = defineStore('formsData', {
       password: {
         id: "password",
         fieldType: 'Text',
-        type: "tel",
+        type: "password",
         label: "Ваш пароль",
         placeholder: "Введите ваш пароль",
         mask: "",
@@ -158,16 +158,20 @@ export const useformsDataStore = defineStore('formsData', {
       newAccountType: {
         id: "newAccountType",
         type: "text",
-        fieldType: 'Text',
-        label: "введите новый тип счёта",
-        placeholder: "новый тип счёта",
+        fieldType: 'CustomSelect',
+        label: "тип счёта",
+        placeholder: "тип счёта",
         mask: "",
+        onlySelect: true,
+        items: accountTypes,
         errors: [],
         rules: [
-          {type: 'required', message: 'тип счёта обязателен'},
+          {type: 'required', message: 'поле обязательно'},
 
         ],
+        selectHasSearch: true,
         valueId: null,
+        valueEn: '',
         value: "",
       },
       transactionAmount: {
@@ -198,10 +202,10 @@ export const useformsDataStore = defineStore('formsData', {
           {type: 'required', message: 'поле обязательно'},
 
         ],
-        selectHasSearch: true,
+        selectHasSearch: false,
         value: "",
         valueId: null,
-        showButton: true
+        showButton: false
       },
       transactionCurrency: {
         id: "transactionCurrency",
@@ -311,7 +315,7 @@ export const useformsDataStore = defineStore('formsData', {
         items: [],//массив для выбора из списка
         errors: [],
         rules: [
-          {type: 'required', message: 'поле обязательно'},
+          // {type: 'required', message: 'поле обязательно'},
 
         ],
         valueId: null,
@@ -326,7 +330,7 @@ export const useformsDataStore = defineStore('formsData', {
         mask: "",
         errors: [],
         rules: [
-          {type: 'required', message: 'сумма обязательна'},
+          // {type: 'required', message: 'сумма обязательна'},
 
         ],
         valueId: null,
@@ -341,7 +345,7 @@ export const useformsDataStore = defineStore('formsData', {
         mask: "",
         errors: [],
         rules: [
-          {type: 'required', message: 'сумма обязательна'},
+          // {type: 'required', message: 'сумма обязательна'},
 
         ],
         valueId: null,
@@ -372,7 +376,6 @@ export const useformsDataStore = defineStore('formsData', {
     updateField(fieldName, value) {
       console.log(12, fieldName, value, this.fields[fieldName])
       if (this.fields[fieldName]) {
-        console.log('hello')
         this.fields[fieldName].value = value;
         this.validateField(fieldName);
       }
@@ -415,9 +418,10 @@ export const useformsDataStore = defineStore('formsData', {
       if(value.id){
         this.fields[fieldName].valueId = value.id;
 
-        if(this.fields[fieldName].id === 'accountType'){
+        if(this.fields[fieldName].id === 'accountType' || this.fields[fieldName].id === 'newAccountType'){
           this.fields[fieldName].valueEn = value.nameEn;
         }
+        // else if(this.fields[fieldName].id === 'newAccountType'){}
       }
       
       this.fields[fieldName].value = value.name;

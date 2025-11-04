@@ -1,6 +1,6 @@
 <template>
     <div class="text_container">
-        <div  class="text_container_outer">
+        <div class="text_container_outer">
             <label for="id">{{ label }}</label>
             <div class="text_container_inner">
                 <input
@@ -16,8 +16,8 @@
                 />
                 
                 <button
-                    v-if="id === 'password'"
-                    @click="showPassword = !showPassword" 
+                    v-if="id === 'password' || id === 'confirmPassword'"
+                    @click="passwordHanler" 
                     class="text_container_inner_button">
                     <img src="../assets/img/icons8-eye-50.png">
                 </button>
@@ -52,31 +52,37 @@ export default {
     showErrors: { type: Boolean, default: true }
   },
   mounted() {
-    const store = useformsDataStore();
-    store.initField(this.id, '', this.rules);
+    // const store = useformsDataStore();
+    this.store.initField(this.id, '', this.rules);
   },
   computed: {
+    store(){
+      return useformsDataStore();
+    },
     value() {
-      const store = useformsDataStore();
-      return store.getField(this.id)?.value || '';
+      // const store = useformsDataStore();
+      return this.store.getField(this.id)?.value || '';
     },
     errors() {
-      const store = useformsDataStore();
+      // const store = useformsDataStore();
       // return store.getField(this.id)?.errors || [];
-      return store.getField(this.id)?.errors[0]
+      return this.store.getField(this.id)?.errors[0]
     }
   },
   methods: {
     handleInput(e) {
-      const store = useformsDataStore();
-      store.updateField(this.id, e.target.value);
+      // const store = useformsDataStore();
+      this.store.updateField(this.id, e.target.value);
       this.$emit('update:modelValue', e.target.value);
     },
     handleBlur() {
-      const store = useformsDataStore();
-      store.markAsTouched(this.id);
-      store.validateField(this.id);
+      // const store = useformsDataStore();
+      this.store.markAsTouched(this.id);
+      this.store.validateField(this.id);
       this.$emit('blur');
+    },
+    passwordHanler(){
+      this.store.fields[this.id].type === 'password' ? this.store.fields[this.id].type = 'text' : this.store.fields[this.id].type = 'password'
     }
   }
 }

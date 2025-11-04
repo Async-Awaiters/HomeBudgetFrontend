@@ -269,6 +269,9 @@ import { useformsDataStore } from '@/stores/formsData'
         box-shadow: 0px 8px 12px 4px rgba(34, 60, 80, 0.2);
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
+        max-height: 400px;
+        overflow-y: scroll;
+        padding: 10px 0;
 
         &-item {
             cursor: pointer;
@@ -311,6 +314,10 @@ import { useformsDataStore } from '@/stores/formsData'
     font-size: 18px;
     border-radius: 8px;
     cursor: pointer;
+    // position: absolute;
+    // top: 50%;
+    // left: 50%;
+    // transform: translate(-50%, -50%);
 
 }
 </style>

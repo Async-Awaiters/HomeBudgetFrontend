@@ -1,11 +1,9 @@
 import axios from 'axios';
-import { useUIDataStore } from '@/stores/UIData';
+// import { useUIDataStore } from '@/stores/UIData';
 
 // const store = useUIDataStore();
 // console.log('store connector', store);
 // const baseUrl = "http://localhost:5000/api/";
-
-console.log('links', process.env.VUE_APP_AUTH_URL)
 
 function proxyConnector(url, method, data) {
     let config = {
@@ -17,8 +15,6 @@ function proxyConnector(url, method, data) {
         url: process.env.VUE_APP_ACC_URL  + url,
         data : data ? data : null
     };
-
-    console.log('config connector', config)
 
     return new Promise((resolve, reject) => {
         axios(config)
@@ -41,8 +37,6 @@ function authProxyConnector(url, method, data) {
         data : data ? data : null
     };
 
-    console.log('config connector', config)
-
     return new Promise((resolve, reject) => {
         axios(config)
             .then(response => {
@@ -63,8 +57,6 @@ function dictionaryProxyConnector(url, method, data) {
         url: process.env.VUE_APP_DIC_URL + url,
         data : data ? data : null
     };
-
-    console.log('config connector', config)
 
     return new Promise((resolve, reject) => {
         axios(config)
@@ -125,8 +117,8 @@ export default {
                 deleteTransaction(id){
                     return proxyConnector(`transactions/${id}`, "DELETE")
                 },
-                updateTransaction(id){  
-                    return proxyConnector(`transactions/${id}`, "PUT")
+                updateTransaction(id, data){  
+                    return proxyConnector(`transactions/${id}`, "PUT", data)
                 },
 
                 confirmTransaction(id){

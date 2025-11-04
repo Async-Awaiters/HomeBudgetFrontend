@@ -113,6 +113,9 @@ import { useformsDataStore } from '@/stores/formsData';
         methods: {
             selectCategoriesAction(e){
                 this.selectedCategoriesAction = e;
+                if(this.selectedCategoriesAction.nameId !== 'create'){
+                    this.getCategories();
+                }
             },
             categoriesAction(){
                 if(this.selectedCategoriesAction){
@@ -123,7 +126,8 @@ import { useformsDataStore } from '@/stores/formsData';
                             };
                             this.connector.addCategories(data)
                                 .then(res => {
-                                    this.uiStore.showNotification(false, 'Вы успешно добавили категорию', true);// не работает!
+                                    this.formsStore.fields.categoriesCreateField.value = '';
+                                    this.uiStore.showNotification(false, 'Вы успешно добавили категорию', true);
                                 })
                                 .catch(err => {
                                     this.uiStore.showNotification(true, 'Не получилось добавить категорию!', true);

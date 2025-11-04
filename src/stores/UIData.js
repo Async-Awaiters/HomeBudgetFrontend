@@ -13,7 +13,6 @@ export const useUIDataStore = defineStore('UIData', {
             isActive: false,
             accountToDeleteId: null
         },
-        isNeedBalanceUpdate: false
 
     }),
     actions: {

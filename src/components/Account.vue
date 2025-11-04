@@ -23,6 +23,20 @@
         </div>
 
         <div v-if="selectedAccountAction?.nameId === 'getAll' && accounts.length > 0">
+            <div class="account_sorting">
+                <ul class="account_sorting_list">сортировать по:
+                    <li 
+                        @click="accountsSortingBy = 'name'"
+                        :class="accountsSortingBy === 'name' ? 'isSortingActive' : ''" 
+                        class="account_sorting_list-item">названию
+                    </li>
+                    <li 
+                        @click="accountsSortingBy = 'balance'"
+                        :class="accountsSortingBy === 'balance' ? 'isSortingActive' : ''" 
+                        class="account_sorting_list-item">балансу
+                    </li>
+                </ul> 
+            </div>
             <ul 
                 ref="list" 
                 :class="dropDownOpen ? 'dropdown-open' : ''" 
@@ -38,7 +52,16 @@
                     <p class="account_sum">баланс: {{ account.balance }}</p>
                 </li>
             </ul>
-            <button @click="openDropdown" class="account_list_button"></button>
+            <button @click="openDropdown" class="account_list_button">
+                <svg :class="{isOpen: dropDownOpen}" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                <path style="fill:#FFA500;" d="M507.344,154.765c-7.713-10.283-22.301-12.367-32.582-4.655L256.005,314.182L37.238,150.111
+                    c-10.283-7.713-24.869-5.626-32.582,4.655c-7.713,10.282-5.627,24.871,4.655,32.582l232.732,174.544
+                    c4.138,3.103,9.05,4.655,13.964,4.655c4.912,0,9.826-1.552,13.964-4.655l232.72-174.544
+                    C512.971,179.636,515.056,165.048,507.344,154.765z"
+                />
+            </svg>
+            </button>
         </div>
         <p v-if="selectedAccountAction?.nameId === 'getAll' && accounts.length === 0" >Счета не найдены</p>
         
@@ -92,6 +115,7 @@ import { useroutesDataStore } from '@/stores/routesData';
                 ],
                 currencies: [],
                 selectedType: '',
+                accountsSortingBy: 'balance'
                 
             }
         },
@@ -99,13 +123,28 @@ import { useroutesDataStore } from '@/stores/routesData';
             connector() {
                 return this.$root.connector;
             },
-
-            accountsToShow(){
-                if(!this.dropDownOpen && this.accounts){
-                    return this.accounts.length > this.countOfShowAccounts ? this.accounts.slice(0, this.countOfShowAccounts) : this.accounts
-                }else {
-                    return this.accounts
+            sortedAccounts(){
+                const accounts = [...this.accounts]; // копия массива
+        
+                switch (this.accountsSortingBy) {
+                    case 'name':
+                        return accounts.sort((a, b) => a.name.localeCompare(b.name));
+                    case 'balance':
+                        return accounts.sort((a, b) => b.balance - a.balance);
+                    default:
+                        return accounts;
                 }
+
+            },
+            accountsToShow(){
+                if (!this.accounts) return [];
+                const sorted = this.sortedAccounts;
+                
+                if (!this.dropDownOpen && this.countOfShowAccounts > 0) {
+                    return sorted.slice(0, this.countOfShowAccounts);
+                }
+                
+                return sorted;
             },
 
             getTotalSum(){
@@ -128,6 +167,9 @@ import { useroutesDataStore } from '@/stores/routesData';
                 this.$router.push({
                     name: 'account',
                     params: {id: e.id},
+                    query: {
+                        currencyId: e.currencyId
+                    }
                                        
                 })
                 // this.state.accountPageData = e
@@ -141,11 +183,12 @@ import { useroutesDataStore } from '@/stores/routesData';
             selectAccountAction(e){
                 console.log(e)
                 this.selectedAccountAction = e
+                this.callAccounts()
+                
             },
             callAccounts(){
                 this.connector.getAccounts()
                         .then(res =>{
-                            console.log('getAllAccounts res', res)
                             this.accounts = res.data;
                             // this.getCurrencies();
                         })
@@ -161,12 +204,15 @@ import { useroutesDataStore } from '@/stores/routesData';
                         name: this.store.accountName.value,
                         type: this.store.accountType.valueEn,
                         is_active: true,
-                        userId: JSON.parse(localStorage.getItem('userId'))
+                        userId: JSON.parse(localStorage.getItem('userId')),
+                        currencyId: this.store.accountCurrency.valueId
                     }
                     this.loading = true;
                     this.connector.createAccount(requestData)
                         .then(res => {
-                            console.log('create account res', res)
+                            this.store.accountName.value = ''
+                            this.store.accountType.valueEn = ''
+                            this.store.accountCurrency.valueId = ''
                         })
                         .catch(err => {
                             console.log(err)
@@ -266,9 +312,15 @@ import { useroutesDataStore } from '@/stores/routesData';
         &_button {
             width: 100%;
             height: 40px;
-            background-color: #8D917A;
+            // background-color: #8D917A;
+            background-color: #71ceed;
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
+
+            & > svg {
+                width: 34px;
+                height: 32px;
+            }
 
         }
     }
@@ -311,5 +363,28 @@ import { useroutesDataStore } from '@/stores/routesData';
             
         }
     }
+
+    &_sorting {
+        margin-bottom: 20px;
+
+        &_list {
+            list-style-type: none;
+            display: flex;
+            gap: 20px;
+            &-item {
+                cursor: pointer;
+                
+            }
+        }
+
+    }
+}
+.isSortingActive {
+    text-decoration: underline;
+}
+
+.isOpen {
+    transition: all 0.3s ease-in;
+    transform: rotate(180deg);
 }
 </style>

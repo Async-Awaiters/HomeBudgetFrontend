@@ -13,10 +13,10 @@
             <div class="account-page_fields_fields">
                 <Field :fieldName="'newAccountName'"/>
                 <Field :fieldName="'newAccountType'"/>
-           </div>
-           <div class="account-page_fields_buttons">
-            <button @click="editAcoount">Изменить</button>
-           </div>
+            </div>
+            <div class="account-page_fields_buttons">
+                <button @click="editAccount">Изменить</button>
+            </div>
         </div>
         
         <div class="account-page_buttons">
@@ -27,53 +27,43 @@
                 >{{ editButtonText }}
             </button>
             <button
-                @click="deleteAcoount"
+                @click="deleteAccount"
                 class="account-page_buttons_button delete"
                 >Удалить счёт
             </button>
         </div> 
         <div class="transactions">
             <h2 class="transactions_title">Транзакции</h2>
-            <div>
+            <!-- <div>
                 <SwitchPanel
                     @select-item="selectTransactionAction"
                     :items="transactionsActions"
                 />
-                <!-- <button 
-                    @click="switchAction"
-                    id="add"
-                    class="account-page_buttons_button transactions"
-                    >Добавить транзакцию
-                </button>
-                <button 
-                    @click="switchAction"
-                    id="add"
-                    class="account-page_buttons_button transactions"
-                    >Изменить транзакцию
-                </button>
-                <button 
-                    @click="switchAction"
-                    id="add"
-                    class="account-page_buttons_button transactions"
-                    >Удалить транзакцию
-                </button> -->
-            </div>
+            </div> -->
+            <button 
+                @click="currentTransactionAction = 'add'"
+                id="add"
+                class="account-page_buttons_button transactions"
+                >Добавить транзакцию
+            </button>
             <AddTransaction 
-                v-if="currentTransactionAction"
-                :id="currentAccount?.id"
+                v-if="currentTransactionAction === 'add' || currentTransactionAction === 'edit'"
+                :id="transactionToEdit?.id"
                 :action="currentTransactionAction.nameId"
+                :isEdit="isEdit"
+                :transactionToEdit="transactionToEdit"
+                :userId="userId"
                 @handleRequest="handleRequest"
+                @close-transactions="closeTransactions"
             />
             <ul v-if="transactionsCheck" class="transactions_list">
-                <li 
+                <TransactionItem
                     v-for="transaction in transactions"
-                    :key="transaction.amount"
-                    class="transactions_list-item"
-                    >
-                    <p>Баланс: {{ formatAmount(transaction.amount) }}</p>
-                    <p>Описание: {{ transaction.description }}</p>
-                    <p>Дата создания: {{ formatDate(transaction.date) }}</p>
-                </li>
+                    :key="transaction.id"
+                    @edit-transaction="handleEditTransaction"
+                    @delete-transaction="deleteTransactionHandler"  
+                    :transaction="transaction"
+                />
             </ul>
             <p v-else>нет транзакций</p>
         </div>
@@ -87,14 +77,16 @@ import { useformsDataStore } from '@/stores/formsData';
 import { useUIDataStore } from '@/stores/UIData';
 import Field from '@/components/Field.vue';
 import AddTransaction from '@/parts/AddTransaction.vue';
-import moment from 'moment';
+// import moment from 'moment';
 import SwitchPanel from '@/parts/SwitchPanel.vue';
+import TransactionItem from '@/parts/TransactionItem.vue';
 
     export default {
         components: {
             Field,
             AddTransaction,
-            SwitchPanel
+            SwitchPanel,
+            TransactionItem
         },
         data(){
             return {
@@ -121,29 +113,33 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
                         initialSelect:false
                     },
                 ],
-                currentTransactionAction: null
+                currentTransactionAction: null,
+                isEdit: false,
+                transactionToEdit: null,
+                userId: null,
+                isShowTransactionModal: false,
+                currencies: [],
+                isCurrenciesAdded: false,
+                // accountCategories: []
             }
         },
         computed: {
             connector(){
                 return this.$root.connector;
             },
-            percentFromTotalSum(){
-                return (this.state.accountPageData.sum / this.state.totalSum) * 100
-            },
-            
             editButtonText(){
                 return !this.isShowFields ? 'Изменить счёт' : 'Не изменять счёт'
             },
             uiStore(){
                 return useUIDataStore()
             },
-            formatMoney(){
-                return this.currentAccount ? new Intl.NumberFormat("ru-RU", {style: currency, currency: 'RUB'}).format(this.currentAccount.balance) : 0;
-            },
+            
             transactionsCheck(){
                 return this.transactions.length > 0 ? true : false;
-            }
+            },
+            store(){
+                return useformsDataStore().$state.fields
+            },
             
         },
         methods: {
@@ -152,29 +148,32 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
                 console.log('id', id)
                 this.connector.getAccount(id)
                     .then(res => {
-                        console.log('getAccount res', res)
-                        this.currentAccount = res.data; // todo проверить ответ!
+                        this.currentAccount = res.data;
                         this.getTransactionsByAccount(res.data.id);
+                        this.userId = res.data.userId;
                     })
                     .catch(err => {
                         console.log('getAccount err', err)
                     })
             },
-            editAcoount(){
-                const store = useformsDataStore().$state.fields;
+            editAccount(){
+                // const store = useformsDataStore().$state.fields;
                 const data = {
-                    name: store.newAccount.name.value,
-                    type: store.newAccountType.value
+                    name: this.store.newAccountName.value,
+                    type: this.store.newAccountType.valueEn
                 }
                 this.connector.editAccount(data, this.$route.params.id)
                     .then(res => {
-                        console.log('editAccount res', res)
+                        this.store.newAccountName.value = ''
+                        this.store.newAccountType.valueEn = ''
+                        this.store.newAccountType.value = ''
+                        this.getCurrentAccount()
                     })
                     .catch(err => {
                         console.log('editAccount err', err)
                     })
             },
-            deleteAcoount(){
+            deleteAccount(){
                 console.log('delete store', useUIDataStore())
                 const store = useUIDataStore().$state.modalData;
                 store.accountToDeleteId = this.$route.params.id;
@@ -187,10 +186,18 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
                 }else if(e.target.id === 'edit'){
                     this.currentAction = 'edit'
                 }
+
+                // this.connector.getCategories()
+                //     .then(res => {
+                //         console.log('types', this.store)
+                //         this.store.newAccountType.items = res.data;
+                //     })
+                //     .catch(err => {
+                //         console.log('getCategories err', err)
+                //     })
             },
             getTransactionsByAccount(){
                 const accountId = this.currentAccount?.id
-                console.log('accID', accountId)
                 this.connector.getTransactions(accountId)
                     .then(res => {
                         console.log('getTransactions res', res)
@@ -200,33 +207,84 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
                         console.log('getTransactions err', err)
                     })
             },
-            formatDate(date){
-                const formateDate = moment(date).format("DD.MM.YYYY HH:mm")
-                return formateDate
-            },
 
-            formatAmount(amount){
-                const money = new Intl.NumberFormat("ru-RU", {style: 'currency', currency: 'RUB'}).format(amount)
-                console.log('money', money)
-                return money
+            formatAmount(amount) {
+                const getCurrencyId = this.$route.query.currencyId;
+                
+                console.log('getCurrencyId', getCurrencyId)
+                if (!getCurrencyId) {
+                    return new Intl.NumberFormat("ru-RU", {
+                        style: "currency",
+                        currency: "RUB"
+                    }).format(amount);
+                }
+
+                const searchingCurrency = this.currencies?.find(item => item.id === getCurrencyId);
+
+                if (!searchingCurrency) {
+                    return new Intl.NumberFormat("ru-RU").format(amount);
+                }
+
+                return new Intl.NumberFormat("ru-RU", {
+                    style: "currency",
+                    currency: searchingCurrency.code
+                }).format(amount);
             },
             handleRequest(){
                 this.getTransactionsByAccount();
+                this.getCurrentAccount();
             },
-            selectTransactionAction(e){
-                console.log(e)
-                this.currentTransactionAction = e
-                // this.currentAction = e?.nameId
+            // selectTransactionAction(e){
+            //     console.log(e)
+            //     this.currentTransactionAction = e
+            //     // this.currentAction = e?.nameId
+            // },
+            handleEditTransaction(e){
+                console.log('edit transaction', e)
+                // 'transactionAmount',  'transactionCategory', 'transactionDescription']
+                this.currentTransactionAction = 'edit';
+                this.transactionToEdit = e;
+                this.isEdit = true;
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                })
             },
+            deleteTransactionHandler(id){
+                this.connector.deleteTransaction(id)
+                    .then(res => {
+                        console.log('res', res)
+                        // const index  = this.transactions.findIndex(item => item.id === id);
+                        // this.transactions.splice()
+                        this.transactions = this.transactions.filter(item => item.id !== id);
+                        this.getCurrentAccount()
+                    })
+                    .catch(err => {
+                        console.log('deleteTransaction err', err)
+                    })
+            },
+            closeTransactions(){
+                this.currentTransactionAction = null;
+            },
+            isShowConversationHandler(transaction){
+                this.isShowTransactionModal = true;
+            },
+            getCurrencies(){
+                this.connector.getCurrencies()
+                    .then(res => {
+                        this.currencies = res.data;
+                        this.isCurrenciesAdded = true;
+                    })
+                    .catch(err => {
+                        console.err('getCurrecies err', err)
+                    })
+            }
         },
-        mounted(){
+        async mounted(){
             this.getCurrentAccount();
+            this.getCurrencies();
         },
-        created(){
-            // this.getMockData(this.$route.params.id)
 
-            
-        }
     }
 </script>
 
@@ -246,12 +304,16 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
 
     &_fields {
         display: flex;
-        // flex-direction: column;
-        align-items: center;
+        flex-direction: column;
+        // align-items: flex-start;
+        align-items: start;
+        margin-bottom: 30px;
 
         &_fields {
             max-width: 430px;
             width: 100%;
+
+        margin-bottom: 30px;
         }
 
         &_buttons {
@@ -261,6 +323,8 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
                 max-width: 150px;
                 width: 100%;
                 background-color: grey;
+                padding: 0 5px;
+                color: #fff;
 
             }
         }
@@ -286,10 +350,12 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
         margin-bottom: 40px;
 
         &_button {
+            
             height: 42px;
             max-width: 200px;
             width: 100%;
             border-radius: 8px;
+
             
             &.edit {
                 background-color: #BFFF00;
@@ -314,28 +380,9 @@ import SwitchPanel from '@/parts/SwitchPanel.vue';
     &_title {
         margin-bottom: 40px;
     }
+}
 
-    &_list {
-        list-style-type: none;
-
-        &-item {
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            padding: 20px;
-            margin-bottom: 10px;
-            background-color: #78DBE2;
-            border-radius: 8px;
-
-            &:nth-child(odd){
-                background-color: #42AAFF;
-                color: #fff;
-            }
-            
-            & p {
-                text-align: left;
-            }
-        }
-    }
+.isShow {
+    display: block;
 }
 </style>

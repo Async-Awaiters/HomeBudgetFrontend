@@ -25,13 +25,13 @@
                 >залогинен как: {{ loginNickname }}
                 <a @click="logout">выйти</a>
             </p>
-            <button @click="isShowNotifications = !isShowNotifications" class="notification_btn">
+            <!-- <button @click="isShowNotifications = !isShowNotifications" class="notification_btn">
                 <img src="../assets/img/notification.svg" >
-            </button>
+            </button> -->
         </div>
-        <Transition>
+        <!-- <Transition>
             <Notifications v-if="isShowNotifications" class="header_notifications"/>
-        </Transition>
+        </Transition> -->
     </header>
 </template>
 
@@ -112,7 +112,6 @@ import moment from "moment";
                 const uiStore = useUIDataStore()
                 this.connector.logout()
                     .then(response => {
-                        console.log('logout ', response)
                         this.isLogin = true
                         localStorage.removeItem('login')
                         localStorage.removeItem('token')
@@ -127,7 +126,6 @@ import moment from "moment";
             refresh(){
                 this.connector.refresh()
                     .then(res =>{
-                        console.log('refresh res', res)
                         localStorage.setItem('lastRefreshToken', JSON.stringify(this.dateNow))
                         localStorage.setItem('token', JSON.stringify(res.headers.authorization))
                     })

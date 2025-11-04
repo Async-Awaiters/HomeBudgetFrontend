@@ -107,28 +107,10 @@ import { useUIDataStore } from '@/stores/UIData';
             closeModal(){
                 this.$emit('closeWindow')
             },
-            // handleSubmit() {
-            //     let isValid = true
-                
-            //     // Валидация всех полей
-            //     isValid = this.$refs.username.validateField() && isValid
-            //     isValid = this.$refs.email.validateField() && isValid
-            //     isValid = this.$refs.password.validateField() && isValid
-                
-            //     if (isValid) {
-            //         console.log('Форма валидна, данные:', this.form)
-            //         // Отправка данных...
-            //     } else {
-            //         console.log('Форма содержит ошибки')
-            //     }
-            // },
             registerAndLogin(){
                 const store = useformsDataStore().getAllData;
-                console.log('store', store)
                 const UIData = useUIDataStore();
                 if(this.isRegistration){
-                    console.log('check', this.password === this.passwordCheck)
-                    console.log('date', moment(store.birthdate.value, 'DD-MM-YYYY'))
                     if(store.password.value.trim() === store.confirmPassword.value.trim()){
                         if(this.checkPolicy){
                             const currentDate = moment();
@@ -144,11 +126,8 @@ import { useUIDataStore } from '@/stores/UIData';
                                     password: store.password.value,
                                     birthdate: moment(store.birthdate.value, 'DD-MM-YYYY').format('YYYY-MM-DD')
                                 }
-                                
-                                console.log('userData', userData)
                             this.connector.register(userData)
                                 .then(()=> {
-                                    console.log('registered!!!!!!')
                                     // localStorage.setItem('login', JSON.stringify(store.login.value))
                                     this.closeModal()
                                     this.uiStore.showNotification(false, 'Вы зарегистрировались', true)
@@ -165,7 +144,6 @@ import { useUIDataStore } from '@/stores/UIData';
                         
                         
                     }else {
-                        console.log('попал')
                         // this.formsData.errorsNotation.status = true;
                         // this.formsData.errorsNotation.text = "Пароли не совпадают!";
 
@@ -189,7 +167,6 @@ import { useUIDataStore } from '@/stores/UIData';
                     }
                     this.connector.login(userData)
                         .then(response=> {
-                            console.log('logined!!!!!!', response)
                             const statusCode = response.status
                             localStorage.setItem('login', JSON.stringify(store.login.value))
                             localStorage.setItem('token', JSON.stringify(response.headers?.authorization))
@@ -216,7 +193,9 @@ import { useUIDataStore } from '@/stores/UIData';
 
             updateErrorInfo(newStatus, newText) {
                 const store = useformsDataStore()
-                store.updateField('errorsNotation', newStatus, newText)
+                // store.updateField('errorsNotation', newStatus, newText)
+                store.fields.password.errors.push('пароли не совпадают')
+                store.fields.confirmPassword.errors.push('пароли не совпадают')
             },
 
             submitData() {

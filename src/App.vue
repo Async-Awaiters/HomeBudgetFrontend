@@ -31,7 +31,6 @@ export default {
       if(!this.isTokenValid || !token){
         this.$router.replace({name: 'home'})
       }
-      console.log('check 1')
     },
     async callApi(){
       this.$root.connector.refresh()
@@ -39,11 +38,9 @@ export default {
           this.isTokenValid = true
           localStorage.setItem('lastRefreshToken', JSON.stringify(this.dateNow))
           localStorage.setItem('token', JSON.stringify(res.headers.authorization))
-          console.log('call 1')
         })
         .catch(err => {
           this.isTokenValid = false
-          console.log('call 2')
         })
     }
   },
