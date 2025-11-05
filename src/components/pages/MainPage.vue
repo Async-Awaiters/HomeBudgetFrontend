@@ -3,6 +3,7 @@
         <GreetingsPage v-if="!isLogin"/>
         <Account v-if="isLogin" @open-page="openPage"/>
         <Categories v-if="isLogin"/>
+        <Statistics v-if="isLogin"/>
         <Transition>
             <Information v-if="isShowInfo"/>
         </Transition>
@@ -16,13 +17,15 @@ import Information from '@/components/Information.vue';
 import GreetingsPage from './GreetingsPage.vue';
 import { useUIDataStore } from '@/stores/UIData';
 import Categories from '@/parts/Categories.vue';
+import Statistics from '@/parts/Statistics.vue';
 
     export default {
         components: {
             Account,
             Information,
             GreetingsPage,
-            Categories
+            Categories,
+            Statistics
         },
         data(){
             return {

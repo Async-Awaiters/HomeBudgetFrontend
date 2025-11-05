@@ -5,7 +5,7 @@
             @select-item="selectAccountAction"
             :items="accountSwitchPanel"
         />
-        <p class="account_balance">Баланс: {{ balance }}</p>
+        <p class="account_balance">Баланс: {{ formatMoney(balance) }}</p>
         <div class="account_fields">
             <div v-if="selectedAccountAction?.nameId === 'create'" class="account_fields_create">
                 <Field
@@ -247,18 +247,16 @@ import { useroutesDataStore } from '@/stores/routesData';
                     .catch(err => {
                         console.log('getBalance err', err)
                     })
+            },
+            formatMoney(amount){
+                return new Intl.NumberFormat("ru-RU", {style: "currency", currency: "RUB"}).format(amount)
             }
         },
 
         mounted(){
-            // this.addAccountTypes();
-            // this.accounts = mockAccounts;
             this.callAccounts()
-            this.getBalance(); //пока не работает не удалять!
+            this.getBalance();
             this.getCurrencies();
-            // this.state.totalSum = this.getTotalSum;
-            // sessionStorage.setItem('state', JSON.stringify(this.state))
-            // console.log('sum total', this.getTotalSum)
         }
         
     }

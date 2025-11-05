@@ -145,6 +145,9 @@ export default {
                 },
                 getCurrency(id){
                     return dictionaryProxyConnector(`currencies/${id}`,'GET')
+                },
+                getPeriodStatistics(from, to){
+                    return proxyConnector(`statistics/${from}/${to}`)
                 }
             }
         }

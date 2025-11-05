@@ -7,7 +7,7 @@ export const useformsDataStore = defineStore('formsData', {
       email: {
         fieldType: 'Text',
         id: "email",
-        label: 'email',
+        label: 'Email',
         placeholder: "email",
         errors: [],
         rules: [
@@ -35,7 +35,7 @@ export const useformsDataStore = defineStore('formsData', {
         id: "confirmPassword",
         fieldType: 'Text',
         type: "tel",
-        label: "Ваш пароль",
+        label: "Повторите пароль",
         placeholder: "Повторите пароль",
         mask: "",
         errors: [],
@@ -95,7 +95,7 @@ export const useformsDataStore = defineStore('formsData', {
         id: "birthdate",
         type: "text",
         fieldType: 'Birthdate',
-        label: "дата рождения",
+        label: "Дата рождения",
         placeholder: "дата рождения",
         mask: "",
         errors: [],
@@ -346,6 +346,21 @@ export const useformsDataStore = defineStore('formsData', {
         errors: [],
         rules: [
           // {type: 'required', message: 'сумма обязательна'},
+
+        ],
+        valueId: null,
+        value: "",
+      },
+      statisticsFromDate: {
+        id: "statisticsFromDate",
+        type: "text",
+        fieldType: 'Birthdate',
+        label: "дата от",
+        placeholder: "дата от",
+        mask: "",
+        errors: [],
+        rules: [
+          {type: 'required', message: 'дата от'},
 
         ],
         valueId: null,

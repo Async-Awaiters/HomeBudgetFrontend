@@ -1,20 +1,8 @@
 <template>
     <div class="birthdate_container">
         <div class="birthdate_container_outer">
-            <label for="id">Дата рождения</label>
+            <label for="id">{{ label }}</label>
             <div class="birthdate_container_inner">
-                <!-- <input
-                    :type="text"
-                    :id="id"
-                    :value="modelValue"
-                    @input="handleInput"
-                    @blur="handleBlur"
-                    placeholder="дата рождения"
-                    :disabled="disabled"
-                    class="field"
-                    v-maska="'##.##.####'"
-
-                /> -->
                 <input
                     v-model="fieldValue"
                     :id="id"
@@ -29,21 +17,6 @@
                 />
             </div>
         </div>
-        <!-- <v-text-field
-            :id="id"
-            :value="modelValue"
-            @input="handleInput"
-            :placeholder="placeholder"
-            :disabled="disabled"
-            >
-
-        </v-text-field> -->
-        
-        <!-- <p v-if="errorsInfo.status" 
-            class="field_error"
-            >{{ errorsInfo.message }}
-        </p> -->
-        
     </div>
 </template>
 
@@ -52,76 +25,6 @@ import { vMaska } from "maska/vue"
 import moment from "moment"
 import { useformsDataStore } from '@/stores/formsData';
 
-    // export default {
-    //     directives: { maska: vMaska },
-    //     props: {
-    //         label: String,
-    //         label: {
-    //             type: String,
-    //             default: ''
-    //         },
-    //         modelValue: {
-    //             type: [String, Number],
-    //             default: ''
-    //         },
-    //         placeholder: {
-    //             type: String,
-    //             default: ''
-    //         },
-    //         disabled: {
-    //             type: Boolean,
-    //             default: false
-    //         },
-    //         rules: {
-    //             type: Object,
-    //             default: () => ({})
-    //         }
-            
-    //     },
-    //     emits: ['update:modelValue'],
-    //     data(){
-    //         return {
-    //             errorsInfo: {
-    //                 status: false,
-    //                 message: ""
-    //             },
-    //         }
-    //     },
-
-    //     methods: {
-    //         handleInput(event) {
-    //             console.log(event)
-
-    //             this.$emit('update:modelValue', event.target.value)
-                
-    //             this.$emit('input-data', {
-    //                 error: true
-    //             });
-    //             // this.clearValidation(this.id)
-    //         },
-    //         handleBlur(e) {
-    //             this.validateField(e)
-    //             console.log('eee', this.modelValue)
-    //             this.$emit('blur')
-    //         },
-    //         validateField(e) {
-    //             const value = e.target.value
-    //             const isValidValue = moment(value, "DD.MM.YYYY").isValid()
-    //             if(value.length === 0){
-    //                 this.errorsInfo.status = true
-    //                 this.errorsInfo.message = "Поле пустое"
-    //             }
-    //             else if(!isValidValue){
-    //                 this.errorsInfo.status = true
-    //                 this.errorsInfo.message = "Введите валидное значение"
-    //             }else {
-    //                 this.errorsInfo.status = false
-    //                 this.errorsInfo.message = ""
-    //             }
-                
-    //         }
-    //     },
-    // }
     export default {
         directives: { maska: vMaska },
         props: {

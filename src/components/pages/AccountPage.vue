@@ -67,6 +67,10 @@
             </ul>
             <p v-else>нет транзакций</p>
         </div>
+
+        <Transition>
+            <Information v-if="isShowInfo"/>
+        </Transition>
         
     </div>
 </template>
@@ -80,13 +84,15 @@ import AddTransaction from '@/parts/AddTransaction.vue';
 // import moment from 'moment';
 import SwitchPanel from '@/parts/SwitchPanel.vue';
 import TransactionItem from '@/parts/TransactionItem.vue';
+import Information from '../Information.vue';
 
     export default {
         components: {
             Field,
             AddTransaction,
             SwitchPanel,
-            TransactionItem
+            TransactionItem,
+            Information
         },
         data(){
             return {
@@ -120,6 +126,7 @@ import TransactionItem from '@/parts/TransactionItem.vue';
                 isShowTransactionModal: false,
                 currencies: [],
                 isCurrenciesAdded: false,
+                isShowInfo: false,
                 // accountCategories: []
             }
         },
@@ -160,7 +167,10 @@ import TransactionItem from '@/parts/TransactionItem.vue';
                 // const store = useformsDataStore().$state.fields;
                 const data = {
                     name: this.store.newAccountName.value,
-                    type: this.store.newAccountType.valueEn
+                    type: this.store.newAccountType.valueEn,
+                    userId: this.currentAccount.userId,
+                    currencyId: this.currentAccount.currencyId,
+                    balance: this.currentAccount.balance
                 }
                 this.connector.editAccount(data, this.$route.params.id)
                     .then(res => {
@@ -278,7 +288,29 @@ import TransactionItem from '@/parts/TransactionItem.vue';
                     .catch(err => {
                         console.err('getCurrecies err', err)
                     })
-            }
+            },
+            watch: {
+                notificationStatus(newVal, oldVal) {
+                    console.log('Status changed from', oldVal, 'to', newVal)
+                    // Ваша логика при изменении статуса
+                    if(newVal){
+                        this.isShowInfo = true
+                    }
+                },
+                isShowInfo(newVal, oldVal){
+                    if(newVal === true){
+                        console.log('watch не равно')
+                        this.timeout = setTimeout(()=> {
+                            this.isShowInfo = false
+                            this.clearUIState()
+                            
+                            //TODO: подумать стоит ли чистить UIData.infoNotifications при окончании таймаута?
+                        }, this.timeTimeout)
+                    }
+
+                },
+
+            },
         },
         async mounted(){
             this.getCurrentAccount();
