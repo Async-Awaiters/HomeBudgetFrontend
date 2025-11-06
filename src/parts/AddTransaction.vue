@@ -143,6 +143,7 @@ import moment from 'moment';
                         accountId: this.accountId,
                         // category: "Cash",
                         description: this.store.transactionDescription.value,
+                        date: this.transactionToEdit.date
                         // category: 'asndj',
                         // userId: this.userId
                     }
@@ -152,6 +153,7 @@ import moment from 'moment';
                         .then(res => {
                             this.$emit('handle-request')
                             // this.clearFields()
+                            
                             this.uiStore.showNotification(false, 'транзакция создалась', true)// ошибка пофиксить
                         })
                         .catch(err => {

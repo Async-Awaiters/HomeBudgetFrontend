@@ -63,6 +63,7 @@
                     @edit-transaction="handleEditTransaction"
                     @delete-transaction="deleteTransactionHandler"  
                     :transaction="transaction"
+                    :currency="currentCurrency"
                 />
             </ul>
             <p v-else>нет транзакций</p>
@@ -127,6 +128,7 @@ import Information from '../Information.vue';
                 currencies: [],
                 isCurrenciesAdded: false,
                 isShowInfo: false,
+                currentCurrency: ''
                 // accountCategories: []
             }
         },
@@ -158,6 +160,7 @@ import Information from '../Information.vue';
                         this.currentAccount = res.data;
                         this.getTransactionsByAccount(res.data.id);
                         this.userId = res.data.userId;
+                        
                     })
                     .catch(err => {
                         console.log('getAccount err', err)
@@ -230,7 +233,7 @@ import Information from '../Information.vue';
                 }
 
                 const searchingCurrency = this.currencies?.find(item => item.id === getCurrencyId);
-
+                this.currentCurrency = searchingCurrency;
                 if (!searchingCurrency) {
                     return new Intl.NumberFormat("ru-RU").format(amount);
                 }
@@ -244,11 +247,6 @@ import Information from '../Information.vue';
                 this.getTransactionsByAccount();
                 this.getCurrentAccount();
             },
-            // selectTransactionAction(e){
-            //     console.log(e)
-            //     this.currentTransactionAction = e
-            //     // this.currentAction = e?.nameId
-            // },
             handleEditTransaction(e){
                 console.log('edit transaction', e)
                 // 'transactionAmount',  'transactionCategory', 'transactionDescription']

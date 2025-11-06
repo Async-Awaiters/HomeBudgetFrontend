@@ -3,7 +3,7 @@
         class="transactions_list-item"
         >
         <div class="transactions_list-item_info">
-            <p>Баланс: {{ formatAmount(transaction.amount) }}</p>
+            <p>Баланс: {{ formatAmount(transaction?.amount) }}</p>
             <p>Описание: {{ transaction.description }}</p>
             <p>Дата создания: {{ formatDate(transaction.date) }}</p>
         </div>
@@ -28,7 +28,8 @@
 import moment from 'moment';
     export default {
         props: {
-            transaction: Object
+            transaction: Object,
+            currency: Object
         },
         data(){
             return {
@@ -37,13 +38,35 @@ import moment from 'moment';
         },
         methods: {
             formatAmount(amount){
-                const money = new Intl.NumberFormat("ru-RU", {style: 'currency', currency: 'RUB'}).format(amount)
+                const money = new Intl.NumberFormat("ru-RU", {style: 'currency', currency: this.currency.code}).format(amount)
                 return money
             },
             formatDate(date){
                 const formateDate = moment(date).format("DD.MM.YYYY HH:mm")
                 return formateDate
             },
+            // formatAmount(amount) {
+            //     const getCurrencyId = this.$route.query.currencyId;
+                
+            //     console.log('getCurrencyId', getCurrencyId)
+            //     if (!getCurrencyId) {
+            //         return new Intl.NumberFormat("ru-RU", {
+            //             style: "currency",
+            //             currency: "RUB"
+            //         }).format(amount);
+            //     }
+
+            //     const searchingCurrency = this.currencies?.find(item => item.id === getCurrencyId);
+
+            //     if (!searchingCurrency) {
+            //         return new Intl.NumberFormat("ru-RU").format(amount);
+            //     }
+
+            //     return new Intl.NumberFormat("ru-RU", {
+            //         style: "currency",
+            //         currency: searchingCurrency.code
+            //     }).format(amount);
+            // },
 
         }
     }
