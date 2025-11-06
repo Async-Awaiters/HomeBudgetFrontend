@@ -110,13 +110,8 @@ import moment from 'moment';
                     amount: Number(this.store.transactionAmount.value),
                     // currency: this.store.transactionCurrency.value,
                     // category: this.store.transactionCategory.value,
-                    category: this.store.transactionCategory.value,
+                    categoryId: this.store.transactionCategory.valueId,
                     description: this.store.transactionDescription.value, // required
-                    // date,
-                    // planDate: true,
-                    // isApproved: true,
-                    // isRepeated: false,
-                    // isDeleted: true
                 }
                 this.loading = true;
                 if(!this.isEdit){
@@ -125,7 +120,7 @@ import moment from 'moment';
                             this.$emit('handle-request')
                             this.store.transactionAmount.value = '';
                             this.store.transactionDescription.value = '';
-                            this.store.transactionCategory.value = '';
+                            this.store.transactionCategory.valueId = '';
                             this.uiStore.showNotification(false, 'транзакция создалась', true)// ошибка пофиксить
                             // this.clearFields()
                         })
@@ -143,7 +138,8 @@ import moment from 'moment';
                         accountId: this.accountId,
                         // category: "Cash",
                         description: this.store.transactionDescription.value,
-                        date: this.transactionToEdit.date
+                        date: this.transactionToEdit.date,
+                        categoryId: this.store.transactionCategory.valueId
                         // category: 'asndj',
                         // userId: this.userId
                     }
@@ -153,7 +149,9 @@ import moment from 'moment';
                         .then(res => {
                             this.$emit('handle-request')
                             // this.clearFields()
-                            
+                            this.store.transactionAmount.value = '';
+                            this.store.transactionDescription.value = '';
+                            this.store.transactionCategory.valueId = '';
                             this.uiStore.showNotification(false, 'транзакция создалась', true)// ошибка пофиксить
                         })
                         .catch(err => {
