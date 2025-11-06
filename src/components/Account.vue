@@ -77,6 +77,7 @@ import CustomSelect from '@/parts/CustomSelect.vue';
 import RequestButton from '@/parts/RequestButton.vue';
 import { useformsDataStore} from '@/stores/formsData';
 import { useroutesDataStore } from '@/stores/routesData';
+import { useUIDataStore } from '@/stores/UIData';
 
     export default {
         components: {
@@ -134,7 +135,9 @@ import { useroutesDataStore } from '@/stores/routesData';
                     default:
                         return accounts;
                 }
-
+            },
+            uiStore(){
+                return useUIDataStore();
             },
             accountsToShow(){
                 if (!this.accounts) return [];
@@ -212,10 +215,16 @@ import { useroutesDataStore } from '@/stores/routesData';
                         .then(res => {
                             this.store.accountName.value = ''
                             this.store.accountType.valueEn = ''
+                            this.store.accountType.value = ''
                             this.store.accountCurrency.valueId = ''
+                            this.store.accountCurrency.errors = []
+                            this.store.accountCurrency.value = ''
+                            this.uiStore.showNotification(false, 'Вы успешно создали счёт', true)
+
                         })
                         .catch(err => {
                             console.log(err)
+                            this.uiStore.showNotification(true, 'Не удалось создать счёт', true)
                         })
                         .finally(() => {
                             this.loading = false;
@@ -297,13 +306,14 @@ import { useroutesDataStore } from '@/stores/routesData';
 
         &-item {
             display: flex;
-            gap: 20px;
-            height: 40px;
+            gap: 10px;
+            height: 80px;
             border: 1px solid #e4e4e4;
             cursor: pointer;
-            align-items: center;
-            padding-left: 20px;
+            align-items: start;
+            padding: 10px 20px;
             border-radius: 8px;
+            flex-direction: column;
 
         }
 
@@ -321,13 +331,6 @@ import { useroutesDataStore } from '@/stores/routesData';
             }
 
         }
-    }
-
-    &_name {
-        width: 100px;
-        
-        align-items: left;
-
     }
 
     .dropdown-open {

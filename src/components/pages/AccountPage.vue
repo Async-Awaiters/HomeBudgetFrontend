@@ -160,7 +160,7 @@ import Information from '../Information.vue';
                         this.currentAccount = res.data;
                         this.getTransactionsByAccount(res.data.id);
                         this.userId = res.data.userId;
-                        
+
                     })
                     .catch(err => {
                         console.log('getAccount err', err)
@@ -187,7 +187,6 @@ import Information from '../Information.vue';
                     })
             },
             deleteAccount(){
-                console.log('delete store', useUIDataStore())
                 const store = useUIDataStore().$state.modalData;
                 store.accountToDeleteId = this.$route.params.id;
                 store.isActive = true;

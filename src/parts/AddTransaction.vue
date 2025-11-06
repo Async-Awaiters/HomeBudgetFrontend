@@ -121,6 +121,7 @@ import moment from 'moment';
                             this.store.transactionAmount.value = '';
                             this.store.transactionDescription.value = '';
                             this.store.transactionCategory.valueId = '';
+                            this.store.transactionCategory.value = '';
                             this.uiStore.showNotification(false, 'транзакция создалась', true)// ошибка пофиксить
                             // this.clearFields()
                         })
