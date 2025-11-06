@@ -101,7 +101,7 @@ export const useformsDataStore = defineStore('formsData', {
         errors: [],
         rules: [
           {type: 'required', message: 'дата рождения обязательна'},
-
+          {type: 'date', message: 'неверная дата'}
         ],
         valueId: null,
         value: "",
@@ -356,12 +356,27 @@ export const useformsDataStore = defineStore('formsData', {
         type: "text",
         fieldType: 'Birthdate',
         label: "дата от",
-        placeholder: "дата от",
+        placeholder: "дд.мм.гггг",
         mask: "",
         errors: [],
         rules: [
-          {type: 'required', message: 'дата от'},
-
+          {type: 'required', message: 'поле не может быть пустым'},
+          {type: 'date', message: 'неверная дата'}
+        ],
+        valueId: null,
+        value: "",
+      },
+      statisticsToDate: {
+        id: "statisticsToDate",
+        type: "text",
+        fieldType: 'Birthdate',
+        label: "дата до",
+        placeholder: "дд.мм.гггг",
+        mask: "",
+        errors: [],
+        rules: [
+          {type: 'required', message: 'поле не может быть пустым'},
+          {type: 'date', message: 'неверная дата'}
         ],
         valueId: null,
         value: "",
@@ -389,7 +404,7 @@ export const useformsDataStore = defineStore('formsData', {
 
     // Обновление значения
     updateField(fieldName, value) {
-      console.log(12, fieldName, value, this.fields[fieldName])
+      // console.log('formsData updateField', fieldName, value, this.fields[fieldName])
       if (this.fields[fieldName]) {
         this.fields[fieldName].value = value;
         this.validateField(fieldName);
@@ -399,11 +414,13 @@ export const useformsDataStore = defineStore('formsData', {
     // Валидация
     validateField(fieldName) {
       const field = this.fields[fieldName];
+      console.log('formsData field', field)
       if (!field) return;
 
       field.errors = [];
       field.rules.forEach(rule => {
         if (!this.checkRule(field.value, rule)) {
+          console.log(12, rule.message)
           field.errors.push(rule.message);
         }
       });
@@ -415,6 +432,7 @@ export const useformsDataStore = defineStore('formsData', {
         case 'required': return !!value?.trim();
         case 'email': return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
         case 'minLength': return value.length >= rule.value;
+        case 'date': return /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.\d{4}$/.test(value);
         default: return true;
       }
     },
@@ -426,10 +444,6 @@ export const useformsDataStore = defineStore('formsData', {
       }
     },
     select(value, fieldName){
-      console.log('onlySelect', this.fields[fieldName], this.fields[fieldName].onlySelect)
-      // this.value = value
-      console.log('select value', value)
-      console.log('select', this.fields[fieldName])
       if(value.id){
         this.fields[fieldName].valueId = value.id;
 

@@ -16,6 +16,7 @@
                     v-maska="'##.##.####'"
                 />
             </div>
+            <p class="birthdate_error">{{ errors }}</p>
         </div>
     </div>
 </template>
@@ -37,32 +38,33 @@ import { useformsDataStore } from '@/stores/formsData';
             showErrors: { type: Boolean, default: true }
         },
         mounted() {
-            const store = useformsDataStore();
-            store.initField(this.id, '', this.rules);
+            this.store.initField(this.id, '', this.rules);
+            this.errors
         },
         computed: {
+            store(){
+                return useformsDataStore()
+            },
             value() {
-                const store = useformsDataStore();
-                return store.getField(this.id)?.value || '';
+                return this.store.getField(this.id)?.value || '';
             },
             errors() {
-                const store = useformsDataStore();
-                return store.getField(this.id)?.errors || [];
+                console.log('getField', this.store.getField(this.id)?.errors)
+                // return this.store.getField(this.id)?.errors || [];
+                return this.store.getField(this.id)?.errors[0]
             }
         },
         methods: {
             handleInput(e) {
-                const store = useformsDataStore();
-                store.updateField(this.id, e.target.value);
+                this.store.updateField(this.id, e.target.value);
                 this.$emit('update:modelValue', e.target.value);
             },
             handleBlur() {
-                const store = useformsDataStore();
-                store.markAsTouched(this.id);
-                store.validateField(this.id);
+                this.store.markAsTouched(this.id);
+                this.store.validateField(this.id);
                 this.$emit('blur');
             }
-        }
+        },
     }
 </script>
 

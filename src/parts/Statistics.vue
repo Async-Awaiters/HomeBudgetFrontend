@@ -1,10 +1,42 @@
 <template>
     <div :class="{isHidden: isHidden}" class="statistics">
+        
         <div class="statistics_inner">
             <h2 class="statistics_title">Статистика</h2>
-            <div class="statistics_forms">
-                <Field :fieldName="'statisticsFromDate'"/>
+            <div class="statistics_container">
+                <SwitchPanel
+                    @select-item="selectTypeOfStatistics"
+                    :items="switchPanelItems"
+                />
+                <div v-if="isShowRangeForm" class="statistics_forms">
+                    <Field
+                        v-for="field in fields"
+                        :key="field" 
+                        :fieldName="field"
+                    />
+                    <button 
+                        @click="getRangeDataHandler"
+                        :disabled="isDisabledBtn" 
+                        class="statistics_forms_btn">Запросить
+                    </button>
+
+                    <PieChart 
+                        v-if="amounts.length > 0 && isShowRangeForm && isReceivedRangeData"
+                        :chartData="amounts"
+                        :chartLabels="labels"
+                        class="reqestedChart"
+                    />
+                    <p v-if="errors.status" class="statistics_errors">{{ errors.text }}</p>
+
+                </div>
+
+                <PieChart 
+                    v-if="amounts.length > 0 && !isShowRangeForm"
+                    :chartData="amounts"
+                    :chartLabels="labels"
+                />
             </div>
+            
         </div>
 
         <button 
@@ -27,13 +59,38 @@
 <script>
 import moment from 'moment';
 import Field from '@/components/Field.vue'
+import PieChart from './PieChart.vue';
+import SwitchPanel from './SwitchPanel.vue';
+import { useformsDataStore} from '@/stores/formsData';
 
     export default {
-        components: {Field},
+        components: {Field, SwitchPanel, PieChart},
         data(){
             return {
                 statisticsData: [],
-                isHidden: true
+                isHidden: true,
+                isShowRangeForm: false,
+                fields: ['statisticsFromDate', 'statisticsToDate'],
+                switchPanelItems: [
+                    {
+                        id: 1,
+                        nameId: 'perMonth',
+                        name: "за месяц",
+                        initialSelect: true
+                    },
+                    {
+                        id: 2,
+                        nameId: 'range',
+                        name: "выбрать",
+                        initialSelect: false
+                    },
+                ],
+                isReceivedRangeData: false,
+                isDisabledBtn: true,
+                errors: {
+                    status: false,
+                    text: ''
+                }
             }
         },
         computed: {
@@ -42,26 +99,86 @@ import Field from '@/components/Field.vue'
             },
             getMonthAgo(){
                 return moment().subtract(1, 'month').toISOString();
+            },
+            amounts(){
+                if (!this.statisticsData || !this.statisticsData.categoryReport) {
+                    return [];
+                }
+                return this.statisticsData.categoryReport.map(item => item.amount);
+            },
+            labels(){
+                if (!this.statisticsData || !this.statisticsData.categoryReport) {
+                    return [];
+                }
+                return this.statisticsData.categoryReport.map(item => item.categoryName);
+            },
+            store(){
+                return useformsDataStore().$state;
+            },
+            fromHasErrors(){
+                return this.store.fields.statisticsFromDate.errors
+            },
+            toHasErrors(){
+                return this.store.fields.statisticsToDate.errors
             }
         },
         methods: {
-            getPeriodStatistics(){
-                this.connector.getPeriodStatistics(this.getMonthAgo, this.dateNow)
+            getPeriodStatistics(from, to){
+                this.connector.getPeriodStatistics(from, to)
                     .then(res => {
-                        console.log('getPeriodStatistics res', res)
                         this.statisticsData = res.data;
+                        if(this.isShowRangeForm){
+                            this.isReceivedRangeData = true;
+                        }
                     })
                     .catch(err => {
                         console.log('getPeriodStatistics err', err)
+                        this.errors.status = true;
+                        this.errors.text = err
                     })
             },
             hideStatistics(){
                 this.isHidden = !this.isHidden
+            },
+            selectTypeOfStatistics(e){
+                if(e.nameId === 'perMonth'){
+                    this.isShowRangeForm = false;
+                    this.getPeriodStatistics(this.getMonthAgo, this.dateNow)
+                }else {
+                    this.isShowRangeForm = true;
+                }
+            },
+            getRangeDataHandler(){
+                const from = moment(this.store.fields.statisticsFromDate.value, 'DD.MM.YYYY').toISOString();
+                const to = moment(this.store.fields.statisticsToDate.value, 'DD.MM.YYYY').toISOString();
+                console.log('from and to', from, to)
+                if(from && to){
+                    this.getPeriodStatistics(from, to)
+                }else {
+                    this.isDisabledBtn = true;
+                }
+                
             }
         },
-        mounted(){
-            this.getPeriodStatistics()
+        watch:{
+            fromHasErrors(newVal, oldVal){
+                if(newVal.length === 0){
+                    this.isDisabledBtn = false
+                }else {
+                    this.isDisabledBtn = true
+                }
+            },
+            toHasErrors(newVal, oldVal){
+                if(newVal.length === 0){
+                    this.isDisabledBtn = false
+                }else {
+                    this.isDisabledBtn = true
+                }
+            }
         }
+        // async mounted(){
+            
+        // }
     }
 </script>
 
@@ -72,6 +189,10 @@ import Field from '@/components/Field.vue'
     border-radius: 8px;
     padding: 20px;
     position: relative;
+
+    &_container {
+        margin-top: 20px;
+    }
 
     &_hide-button {
         position: absolute;
@@ -90,10 +211,34 @@ import Field from '@/components/Field.vue'
         }
     }
 
+    &_forms {
+        &_btn {
+            background-color: #42AAFF;
+            padding: 2px 5px;
+            height: 40px;
+            width: 100px;
+            border-radius: 8px;
+            color: #fff;
+
+            &:disabled {
+                filter:grayscale(80%);
+            }
+        }
+    }
+
     &.isHidden {
         height: 40px;
         padding: 0;
         overflow: hidden;
     }
+
+    &_error {
+        color: tomato;
+
+    }
+}
+
+.reqestedChart {
+    margin-top: 40px;
 }
 </style>
