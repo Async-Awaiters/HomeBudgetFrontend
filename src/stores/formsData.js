@@ -50,8 +50,8 @@ export const useformsDataStore = defineStore('formsData', {
         id: "login",
         type: "text",
         fieldType: 'Text',
-        label: "Имя пользователя",
-        placeholder: "Имя пользователя",
+        label: "Логин",
+        placeholder: "введите логин",
         mask: "",
         errors: [],
         rules: [
@@ -65,8 +65,8 @@ export const useformsDataStore = defineStore('formsData', {
         id: "firstName",
         type: "text",
         fieldType: 'Text',
-        label: "Имя пользователя",
-        placeholder: "Имя пользователя",
+        label: "Имя",
+        placeholder: "введите имя",
         mask: "",
         errors: [],
         rules: [

@@ -283,7 +283,7 @@ import Information from '../Information.vue';
                         this.isCurrenciesAdded = true;
                     })
                     .catch(err => {
-                        console.err('getCurrecies err', err)
+                        console.log('getCurrecies err', err)
                     })
             },
             watch: {
